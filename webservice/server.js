@@ -25,8 +25,8 @@ app.use(function(req,res,next) {
     });
 });*/
 
-app.get('/calculate/:km/:dr/:td/:sp/:df/:tp', function(req,res){
-    Segment.calculateRoute(req.params.km,req.params.dr,req.params.td,req.params.sp,req.params.df,req.params.tp,function(data){
+app.get('/calculate/:ar/:km/:dr/:td/:sp/:df/:tp', function(req,res){
+    Segment.calculateRoute(req.params.ar,req.params.km,req.params.dr,req.params.td,req.params.sp,req.params.df,req.params.tp,function(data){
             res.json(data);          
     });
 });

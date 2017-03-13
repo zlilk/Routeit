@@ -6,6 +6,7 @@ var travelerSchema = new schema({
     image: String,
     email: {type:String, index:1, required:true, unique:true},
     current_route: {
+        area: String,
         trip_start_pt: String,
         trip_end_pt: String,
         start_date: Date,
@@ -49,6 +50,7 @@ var travelerSchema = new schema({
         ]
     },
     previous_routes: [{
+        area: String,
         trip_start_pt: String,
         trip_end_pt: String,
         start_date: Date,
@@ -92,6 +94,7 @@ var travelerSchema = new schema({
         ]
     }],
     my_routes: [{
+        area: String,
         trip_start_pt: String,
         trip_end_pt: String,
         start_date: Date,

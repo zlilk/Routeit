@@ -1,21 +1,22 @@
 var mongoose = require('mongoose');
 var Segment = require('./segment');
 
-exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, callback){
+exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, type, callback){
     var numOfDailySections, maxTripTotalKm, numOfSegs;
     var maxSegmentKm = 5;
     maxTripTotalKm = totalDays * kmDay; 
     numOfSegs = maxTripTotalKm / maxSegmentKm;
     numOfDailySections = maxTripTotalKm / kmDay;
     console.log(numOfSegs);
-    
+    console.log(area + " " + kmDay + " " +  dir  + " " +  totalDays  + " " +  startPt  + " " + diff  + " " +  type);
     ///////////// too much days ? less segments ?
-
+            
     var start;
     var firstSegIndx, lastSegIndx, segsArr, accommArr;
     
     // if the trip's diresction is from north to south
     if(dir == "north"){
+        console.log("hi");
         start = getFirstSegIndex(callback);
 
         // getting the index of the first segment of the trip
@@ -30,6 +31,7 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
 
         // getting the index of the last segment of the trip
         function getLastSegIndx(firstSegIndx, callback){
+            console.log("blabla");
             lastSegIndx = firstSegIndx + (numOfSegs - 1);
             console.log("last segment i: " + lastSegIndx);
             ////////getAccomm(startPt, totalDays);
@@ -42,6 +44,10 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
             segsArr.exec(function(err,segments){
                 var dailySectionsArr = []; // array of all trip's daily sections
                 var dailySection; // daily section for one day 
+                var totalKm = 0; 
+                var totalType = []; 
+                var endPt;
+                var easyDiff= 0, medDiff = 0, hardDiff = 0;
                 // if the trip's km per day is up to 5 km
                 if(kmDay == 5){
                     for(var i = 0; i<totalDays; i++){
@@ -65,7 +71,18 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                             "type": segments[i].type
                         }
                         dailySectionsArr.push(dailySection);
+                        totalType.push(segments[i].type);
+                        totalKm+=segments[i].total_km;
+                        if(segments[i].difficulty == "קל") easyDiff+=1;
+                        else if(segments[i].difficulty == "בינוני") medDiff+=1;
+                        else hardDiff+=1;
                     }
+                    endPt = segments[(segments.length)-1].end_pt;
+                    //buildRoute(endPT, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, callback);
+                    console.log("total KM: " + totalKm);
+                    console.log("easyDiff: " + easyDiff + " medDiff: " +medDiff+ " hardDiff: "+ hardDiff);
+                    console.log("totalType: " + totalType);
+                    console.log("endPt: " + endPt);
                     callback(dailySectionsArr);
                 }
                 
@@ -92,20 +109,6 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                                 newDiff = "בינוני";
                         }
                         else newDiff = "קל"; 
-                        
-                        /*if(diffArr[0]=="קשה" || diffArr[1]=="קשה"){ 
-                            newDiff = "קשה"; 
-                        }
-                        else if(diffArr[0]=="בינוני"){ 
-                            if(diffArr[1] == "קל" || diffArr[1] == "בינוני")
-                                newDiff = "בינוני";
-                        }
-                        else if(diffArr[0]=="קל"){ 
-                            if(diffArr[1] == "קל")
-                                newDiff = "קל"; 
-                            else if(diffArr[1] == "בינוני")
-                                newDiff = "בינוני";
-                        }*/
 
                         // function that removes duplicates from an array
                         Array.prototype.unique = function() {
@@ -132,6 +135,9 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                         // create new daily section sites
                         var newTypeArr = (segments[j].type).concat(segments[j+1].type).unique();
 
+                        // create new daily section total km
+                        var newTotalKm = (segments[j].total_km + segments[j+1].total_km).toFixed(1);
+                        
                         dailySection = 
                         { 
                             "indx": i+1,
@@ -141,7 +147,7 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                             "start_coord": segments[j].start_coord,
                             "end_coord": segments[j+1].end_coord,
                             "coord_Array": newCoordArr,
-                            "total_km": (segments[j].total_km + segments[j+1].total_km).toFixed(1),
+                            "total_km": newTotalKm,
                             "area": segments[j].area,
                             "duration": newDuration,
                             "difficulty": newDiff,
@@ -152,7 +158,14 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                             "type": newTypeArr
                         }
                         dailySectionsArr.push(dailySection);
+                        totalType.push(newTypeArr);
+                        totalKm+=newTotalKm;
+                        if(newDiff == "קל") easyDiff+=1;
+                        else if(newDiff == "בינוני") medDiff+=1;
+                        else hardDiff+=1;
                     }
+                    endPt = segments[(segments.length)-1].end_pt;
+                    //buildRoute(endPT,  dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, callback);
                     callback(dailySectionsArr);                    
                 }
                 
@@ -210,6 +223,9 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                         var tmpTypeArr = (segments[j].type).concat(segments[j+1].type).unique();
                         var newTypeArr = tmpTypeArr.concat(segments[j+2].type).unique();
 
+                        // create new daily section total km
+                        var newTotalKm = (segments[j].total_km + segments[j+1].total_km + segments[j+2].total_km).toFixed(1);
+
                         dailySection = 
                         { 
                             "indx": i+1,
@@ -219,7 +235,7 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                             "start_coord": segments[j].start_coord,
                             "end_coord": segments[j+2].end_coord,
                             "coord_Array": newCoordArr,
-                            "total_km": (segments[j].total_km + segments[j+1].total_km + segments[j+2].total_km).toFixed(1),
+                            "total_km": newTotalKm,
                             "area": segments[j].area,
                             "duration": newDuration,
                             "difficulty": newDiff,
@@ -230,7 +246,14 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                             "type": newTypeArr
                         }
                         dailySectionsArr.push(dailySection);
+                        totalType.push(newTypeArr);
+                        totalKm+=newTotalKm;
+                        if(newDiff == "קל") easyDiff+=1;
+                        else if(newDiff == "בינוני") medDiff+=1;
+                        else hardDiff+=1;
                     }
+                    endPt = segments[(segments.length)-1].end_pt;
+                    //buildRoute(endPT,  dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, callback);
                     callback(dailySectionsArr);                    
                 }        
             });
@@ -238,33 +261,38 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
     }
     // if the trip's diresction is from north to south
     else if(dir=="south") {
-        start = getFirstSegIndex(callback);
+        start = getFirstSegIndexSouth(callback);
 
         // getting the index of the first segment of the trip
-        function getFirstSegIndex(callback){
+        function getFirstSegIndexSouth(callback){
             var firstSeg = Segment.find({'end_pt':startPt}).select('indx');
             firstSeg.exec(function(err,segment){
             firstSegIndx = segment[0].indx;
             console.log("first segment i: " + firstSegIndx);
-            getLastSegIndx(firstSegIndx, callback);
+            getLastSegIndxSouth(firstSegIndx, callback);
             });
         }
 
         // getting the index of the last segment of the trip
-        function getLastSegIndx(firstSegIndx, callback){
+        function getLastSegIndxSouth(firstSegIndx, callback){
             lastSegIndx = firstSegIndx - (numOfSegs - 1);
             console.log("last segment i: " + lastSegIndx);
             ////////getAccomm(startPt, totalDays);
-            getSegs(firstSegIndx, lastSegIndx, callback);
+            getSegsSouth(firstSegIndx, lastSegIndx, callback);
         }
 
         // getting the trip relevant segments and building the trip daily sections 
-        function getSegs(firstSegIndx, lastSegIndx, callback){
+        function getSegsSouth(firstSegIndx, lastSegIndx, callback){
             segsArr = Segment.find({}).where('indx').gt(lastSegIndx-1).lt(firstSegIndx+1);
             segsArr.exec(function(err,segments){
                 console.log("south: " + segments);
                 var dailySectionsArr = []; // array of all trip's daily sections
                 var dailySection; // daily section for one day 
+                var totalKm = 0; 
+                var totalType = []; 
+                var endPt;
+                var easyDiff= 0, medDiff = 0, hardDiff = 0;
+
                 // if the trip's km per day is up to 5 km
                 if(kmDay == 5){
                     for(var i = 0, j = (segments.length)-1; i < totalDays; i++, j--){
@@ -288,7 +316,15 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                             "type": segments[j].type
                         }
                         dailySectionsArr.push(dailySection);
+                        totalType.push(segments[j].type);
+                        totalKm+=segments[j].total_km;
+                        if(segments[j].difficulty == "קל") easyDiff+=1;
+                        else if(segments[j].difficulty == "בינוני") medDiff+=1;
+                        else hardDiff+=1;
                     }
+                    endPt = segments[0].start_pt;
+                    console.log("endPt: " + endPt);
+                    //buildRouteSouth(endPT, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, callback);
                     callback(dailySectionsArr);
                 }
                 
@@ -355,6 +391,9 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                         // create new daily section sites
                         var newTypeArr = (segments[j].type).concat(segments[j-1].type).unique();
 
+                        // create new daily section total km
+                        var newTotalKm = (segments[j].total_km + segments[j-1].total_km).toFixed(1);
+
                         dailySection = 
                         { 
                             "indx": i+1,
@@ -364,7 +403,7 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                             "start_coord": segments[j].end_coord,
                             "end_coord": segments[j-1].start_coord,
                             "coord_Array": newCoordArr,
-                            "total_km": (segments[j].total_km + segments[j-1].total_km).toFixed(1),
+                            "total_km": newTotalKm,
                             "area": segments[j].area,
                             "duration": newDuration,
                             "difficulty": newDiff,
@@ -375,7 +414,14 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                             "type": newTypeArr
                         }
                         dailySectionsArr.push(dailySection);
+                        totalType.push(newTypeArr);
+                        totalKm+=newTotalKm;
+                        if(newDiff == "קל") easyDiff+=1;
+                        else if(newDiff == "בינוני") medDiff+=1;
+                        else hardDiff+=1;
                     }
+                    endPt = segments[0].start_pt;
+                    //buildRouteSouth(endPT, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, callback);
                     callback(dailySectionsArr);                    
                 }
                 
@@ -433,6 +479,9 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                         var tmpTypeArr = (segments[j].type).concat(segments[j-1].type).unique();
                         var newTypeArr = tmpTypeArr.concat(segments[j-2].type).unique();
 
+                        // create new daily section total km
+                        var newTotalKm = (segments[j].total_km + segments[j-1].total_km + segments[j-2].total_km).toFixed(1);
+
                         dailySection = 
                         { 
                             "indx": i+1,
@@ -442,7 +491,7 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                             "start_coord": segments[j].end_coord,
                             "end_coord": segments[j-2].start_coord,
                             "coord_Array": newCoordArr,
-                            "total_km": (segments[j].total_km + segments[j-1].total_km + segments[j-2].total_km).toFixed(1),
+                            "total_km": newTotalKm,
                             "area": segments[j].area,
                             "duration": newDuration,
                             "difficulty": newDiff,
@@ -453,7 +502,14 @@ exports.calculateRoute = function(kmDay, dir, totalDays, startPt, diff, type, ca
                             "type": newTypeArr
                         }
                         dailySectionsArr.push(dailySection);
+                        totalType.push(newTypeArr);
+                        totalKm+=newTotalKm;
+                        if(newDiff == "קל") easyDiff+=1;
+                        else if(newDiff == "בינוני") medDiff+=1;
+                        else hardDiff+=1;
                     }
+                    endPt = segments[0].start_pt;
+                    //buildRouteSouth(endPT, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, callback);
                     callback(dailySectionsArr);                    
                 }        
             });
