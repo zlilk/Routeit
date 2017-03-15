@@ -14,9 +14,13 @@ var travelerSchema = new schema({
         days_num: Number,
         trip_km: Number,
         day_km: String,
+        trip_difficulty: String,
+        trip_sites: [String],
+        trip_type: [String],
+        trip_description: [String],
         daily_sections: [
             { 
-                indx: {type:Number, index:1, required:true, unique:true},
+                day_num: {type:Number, index:1, required:true, unique:true},
                 date: Date,
                 start_pt: String,
                 end_pt: String,
@@ -58,9 +62,13 @@ var travelerSchema = new schema({
         days_num: Number,
         trip_km: Number,
         day_km: String,
+        trip_difficulty: String,
+        trip_sites: [String],
+        trip_type: [String],
+        trip_description: [String],
         daily_sections: [
             { 
-                indx: {type:Number, index:1, required:true, unique:true},
+                day_num: {type:Number, index:1, required:true, unique:true},
                 date: Date,
                 start_pt: String,
                 end_pt: String,
@@ -102,9 +110,13 @@ var travelerSchema = new schema({
         days_num: Number,
         trip_km: Number,
         day_km: String,
+        trip_difficulty: String,
+        trip_sites: [String],
+        trip_type: [String],
+        trip_description: [String],
         daily_sections: [
             { 
-                indx: {type:Number, index:1, required:true, unique:true},
+                day_num: {type:Number, index:1, required:true, unique:true},
                 date: Date,
                 start_pt: String,
                 end_pt: String,
