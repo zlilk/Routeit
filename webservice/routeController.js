@@ -1,27 +1,26 @@
 var mongoose = require('mongoose');
 var Segment = require('./segment');
+var Accomm = require('./accomm');
 
-exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, type, callback){
-    // function that removes duplicates from an array
-    Array.prototype.unique = function() {
-        var a = this.concat();
-        for(var i=0; i<a.length; ++i) {
-            for(var j=i+1; j<a.length; ++j) {
-                if(a[i] === a[j])
-                    a.splice(j--, 1);
-                }
+// function that removes duplicates from an array
+Array.prototype.unique = function() {
+    var a = this.concat();
+    for(var i=0; i<a.length; ++i) {
+        for(var j=i+1; j<a.length; ++j) {
+            if(a[i] === a[j])
+                a.splice(j--, 1);
             }
-        return a;
-    };
+        }
+    return a;
+};
 
+// calculate suggested route according to traveler's crtieria  
+exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, type, callback){
     var numOfDailySections, maxTripTotalKm, numOfSegs;
     var maxSegmentKm = 5;
     maxTripTotalKm = totalDays * kmDay; 
     numOfSegs = maxTripTotalKm / maxSegmentKm;
     numOfDailySections = maxTripTotalKm / kmDay;
-    //console.log(numOfSegs);
-    //console.log(area + " " + kmDay + " " +  dir  + " " +  totalDays  + " " +  startPt  + " " + diff  + " " +  type);
-    ///////////// too much days ? less segments ?
             
     var start;
     var firstSegIndx, lastSegIndx, segsArr, accommArr;
@@ -34,18 +33,22 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
         function getFirstSegIndex(callback){
             var firstSeg = Segment.find({'start_pt':startPt}).select('indx');
             firstSeg.exec(function(err,segment){
-            firstSegIndx = segment[0].indx;
-            //console.log("first segment i: " + firstSegIndx);
-            getLastSegIndx(firstSegIndx, callback);
+                firstSegIndx = segment[0].indx;
+                getLastSegIndx(firstSegIndx, callback);
             });
         }
 
         // getting the index of the last segment of the trip
         function getLastSegIndx(firstSegIndx, callback){
             lastSegIndx = firstSegIndx + (numOfSegs - 1);
-            //console.log("last segment i: " + lastSegIndx);
-            ////////getAccomm(startPt, totalDays);
-            getSegs(firstSegIndx, lastSegIndx, callback);
+            var checkLastIndx = Segment.find({'indx':lastSegIndx});
+            checkLastIndx.exec(function(err,segment){
+                //console.log("last segment: " + segment);
+                if(segment == ""){ 
+                    callback("segmentsErr");
+                }
+                else getSegs(firstSegIndx, lastSegIndx, callback);
+            });
         }
 
         // getting the trip relevant segments and building the trip daily sections 
@@ -63,18 +66,6 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                 
                 // if the trip's km per day is up to 5 km
                 if(kmDay == 5){
-                    
-                   /* Array.prototype.unique = function() {
-                        var a = this.concat();
-                        for(var i=0; i<a.length; ++i) {
-                            for(var j=i+1; j<a.length; ++j) {
-                                if(a[i] === a[j])
-                                    a.splice(j--, 1);
-                            }
-                        }
-                        return a;
-                    };*/
-
                     for(var i = 0; i<totalDays; i++){
                         dailySection = 
                         { 
@@ -110,15 +101,13 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                     totalType = totalType.unique();
                     totalDescription = totalDescription.unique();
                     endPt = segments[(segments.length)-1].end_pt;
-                    console.log("total KM: " + totalKm);
+                    addAccomToDailySections(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
+                    /*console.log("total KM: " + totalKm);
                     console.log("totalDescription: " + totalDescription);
                     console.log("totalSites: " + totalSites);
                     console.log("easyDiff: " + easyDiff + " medDiff: " +medDiff+ " hardDiff: "+ hardDiff);
                     console.log("totalType: " + totalType);
-                    console.log("endPt: " + endPt);
-                    //var suggestedRoute = buildRoute(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites);
-                    buildRoute(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
-                    //callback(suggestedRoute);
+                    console.log("endPt: " + endPt);*/
                 }
                 
                 // if the trip's km per day is 5-10 km
@@ -145,18 +134,6 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                         }
                         else newDiff = "קל"; 
 
-                        /*// function that removes duplicates from an array
-                        Array.prototype.unique = function() {
-                            var a = this.concat();
-                            for(var i=0; i<a.length; ++i) {
-                                for(var j=i+1; j<a.length; ++j) {
-                                    if(a[i] === a[j])
-                                        a.splice(j--, 1);
-                                }
-                            }
-                            return a;
-                        };*/
-            
                         // create new daily section alerts
                         var newAlertsArr = (segments[j].alert).concat(segments[j+1].alert);
 
@@ -199,7 +176,6 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                         totalDescription = tmpTotalDescription.concat(newDescArr);
                         tmpTotalDescription = totalDescription;
                         totalKm+=newTotalKm;
-                        console.log("km "+ i + ": " + totalKm);
                         if(newDiff == "קל") easyDiff+=1;
                         else if(newDiff == "בינוני") medDiff+=1;
                         else hardDiff+=1;
@@ -208,14 +184,7 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                     totalDescription = totalDescription.unique();
                     totalKm.toFixed(1);
                     endPt = segments[(segments.length)-1].end_pt;
-                    //buildRoute(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
-                    console.log("total KM: " + totalKm);
-                    console.log("totalDescription: " + totalDescription);
-                    console.log("totalSites: " + totalSites);
-                    console.log("easyDiff: " + easyDiff + " medDiff: " +medDiff+ " hardDiff: "+ hardDiff);
-                    console.log("totalType: " + totalType);
-                    console.log("endPt: " + endPt);
-                    callback(dailySectionsArr);                    
+                    addAccomToDailySections(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
                 }
                 
                 // if the trip's km per day is 10-15 km
@@ -243,18 +212,6 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                                 newDiff = "בינוני";
                         }
                         else newDiff = "קל"; 
-
-                        /*// function that removes duplicates from an array
-                        Array.prototype.unique = function() {
-                            var a = this.concat();
-                            for(var i=0; i<a.length; ++i) {
-                                for(var j=i+1; j<a.length; ++j) {
-                                    if(a[i] === a[j])
-                                        a.splice(j--, 1);
-                                }
-                            }
-                            return a;
-                        };*/
             
                         // create new daily section alerts
                         var tmpAlertsArr = (segments[j].alert).concat(segments[j+1].alert);
@@ -310,14 +267,7 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                     totalDescription = totalDescription.unique();
                     totalKm.toFixed(1);
                     endPt = segments[(segments.length)-1].end_pt;
-                    //buildRoute(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
-                    console.log("total KM: " + totalKm);
-                    console.log("totalDescription: " + totalDescription);
-                    console.log("totalSites: " + totalSites);
-                    console.log("easyDiff: " + easyDiff + " medDiff: " +medDiff+ " hardDiff: "+ hardDiff);
-                    console.log("totalType: " + totalType);
-                    console.log("endPt: " + endPt);
-                    callback(dailySectionsArr);                    
+                    addAccomToDailySections(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);              
                 }       
             });
         }  
@@ -330,18 +280,22 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
         function getFirstSegIndexSouth(callback){
             var firstSeg = Segment.find({'end_pt':startPt}).select('indx');
             firstSeg.exec(function(err,segment){
-            firstSegIndx = segment[0].indx;
-            console.log("first segment i: " + firstSegIndx);
-            getLastSegIndxSouth(firstSegIndx, callback);
+                firstSegIndx = segment[0].indx;
+                getLastSegIndxSouth(firstSegIndx, callback);
             });
         }
 
         // getting the index of the last segment of the trip
         function getLastSegIndxSouth(firstSegIndx, callback){
             lastSegIndx = firstSegIndx - (numOfSegs - 1);
-            console.log("last segment i: " + lastSegIndx);
-            ////////getAccomm(startPt, totalDays);
-            getSegsSouth(firstSegIndx, lastSegIndx, callback);
+            var checkLastIndx = Segment.find({'indx':lastSegIndx});
+            checkLastIndx.exec(function(err,segment){
+                //console.log("last segment: " + segment);
+                if(segment == ""){ 
+                    callback("segmentsErr");
+                }
+                else getSegsSouth(firstSegIndx, lastSegIndx, callback);
+            });
         }
 
         // getting the trip relevant segments and building the trip daily sections 
@@ -359,18 +313,6 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
 
                 // if the trip's km per day is up to 5 km
                 if(kmDay == 5){
-                    
-                    /*Array.prototype.unique = function() {
-                        var a = this.concat();
-                        for(var i=0; i<a.length; ++i) {
-                            for(var j=i+1; j<a.length; ++j) {
-                                if(a[i] === a[j])
-                                    a.splice(j--, 1);
-                            }
-                        }
-                        return a;
-                    };*/
-
                     for(var i = 0, j = (segments.length)-1; i < totalDays; i++, j--){
                         dailySection = 
                         { 
@@ -407,14 +349,7 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                     totalType = totalType.unique();
                     totalDescription = totalDescription.unique();
                     totalKm.toFixed(1);
-                    //buildRoute(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
-                    console.log("total KM: " + totalKm);
-                    console.log("totalDescription: " + totalDescription);
-                    console.log("totalSites: " + totalSites);
-                    console.log("easyDiff: " + easyDiff + " medDiff: " +medDiff+ " hardDiff: "+ hardDiff);
-                    console.log("totalType: " + totalType);
-                    console.log("endPt: " + endPt); 
-                    callback(dailySectionsArr);
+                    addAccomToDailySections(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
                 }
                 
                 // if the trip's km per day is 5-10 km
@@ -441,24 +376,11 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                         }
                         else newDiff = "קל"; 
 
-                        /*// function that removes duplicates from an array
-                        Array.prototype.unique = function() {
-                            var a = this.concat();
-                            for(var i=0; i<a.length; ++i) {
-                                for(var j=i+1; j<a.length; ++j) {
-                                    if(a[i] === a[j])
-                                        a.splice(j--, 1);
-                                }
-                            }
-                            return a;
-                        };*/
-            
                         // create new daily section alerts
                         var newAlertsArr = (segments[j].alert).concat(segments[j-1].alert);
 
                         // create new daily section description
                         var newDescArr = (segments[j].description).concat(segments[j-1].description).unique();
-                        console.log(newDescArr); 
                         
                         // create new daily section sites
                         var newSitesArr = (segments[j].sites).concat(segments[j-1].sites);
@@ -504,15 +426,8 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                     totalType = totalType.unique();
                     totalDescription = totalDescription.unique();
                     totalKm.toFixed(1);
-                    //buildRoute(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
-                    console.log("total KM: " + totalKm);
-                    console.log("totalDescription: " + totalDescription);
-                    console.log("totalSites: " + totalSites);
-                    console.log("easyDiff: " + easyDiff + " medDiff: " +medDiff+ " hardDiff: "+ hardDiff);
-                    console.log("totalType: " + totalType);
-                    console.log("endPt: " + endPt);
-                    callback(dailySectionsArr);                    
-                }
+                    addAccomToDailySections(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
+               }
                 
                 // if the trip's km per day is 10-15 km
                 if(kmDay == 15){
@@ -540,18 +455,6 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                         }
                         else newDiff = "קל"; 
 
-                       /* // function that removes duplicates from an array
-                        Array.prototype.unique = function() {
-                            var a = this.concat();
-                            for(var i=0; i<a.length; ++i) {
-                                for(var j=i+1; j<a.length; ++j) {
-                                    if(a[i] === a[j])
-                                        a.splice(j--, 1);
-                                }
-                            }
-                            return a;
-                        };*/
-            
                         // create new daily section alerts
                         var tmpAlertsArr = (segments[j].alert).concat(segments[j-1].alert);
                         var newAlertsArr = tmpAlertsArr.concat(segments[j-2].alert);
@@ -606,24 +509,47 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                     totalType = totalType.unique();
                     totalDescription = totalDescription.unique();
                     totalKm.toFixed(1);
-                    //buildRoute(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
-                    console.log("total KM: " + totalKm);
-                    console.log("totalDescription: " + totalDescription);
-                    console.log("totalSites: " + totalSites);
-                    console.log("easyDiff: " + easyDiff + " medDiff: " +medDiff+ " hardDiff: "+ hardDiff);
-                    console.log("totalType: " + totalType);
-                    console.log("endPt: " + endPt);
-                    callback(dailySectionsArr);                    
+                    addAccomToDailySections(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
                 }        
             });
         }        
     }
+
+    //function that adds the accommodation lists for all of the daily sections
+    function addAccomToDailySections(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback){
+        var accommPointsArr = [];
+        for(i = 0; i<dailySectionsArr.length; i++){
+            accommPointsArr.push(dailySectionsArr[i].end_pt);
+        }
+        // get all of the accommodation lists for all of daily section's end points
+        var getAccom = Accomm.find({'point_name':{'$in' : accommPointsArr}});
+        getAccom.exec(function(err,accommArr){
+            addToDaily(accommArr, endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
+        });  
+
+        // adding the accommodation lists to daily sections array
+        function addToDaily(accommArr, endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback){
+            for(j = 0; j<dailySectionsArr.length; j++){
+                for(k = 0; k<accommArr.length; k++){
+                    if(dailySectionsArr[j].end_pt == accommArr[k].point_name){
+                        dailySectionsArr[j].accomm = accommArr[k].accomm_list;
+                    }
+                }
+            }
+            buildRoute(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback);
+        }
+    }
     
+    // function that builds the suggested route
     function buildRoute(endPt, dailySectionsArr, totalKm, easyDiff, medDiff, hardDiff, totalType, totalDescription, totalSites, callback){
-        var isTypeRight = true; //flag to check if the chosen type matches the trip type
+        var isTypeRight = false; //flag to check if the chosen type matches the trip type
         var isDiffRight = true; //flag to check if the chosen difficulty matches the trip difficulty
         var totalDiff = ""; //trip's total difficulty
         var currentRoute; //the suggested route
+        var isTypeRightOld = false; //flag to check if the type is for old people
+        var isTypeRightFamily = false; //flag to check if the type is for families
+        var isTypeRightChallenge = false; //flag to check if the type is challenging
+        var isTypeRightHard = false; //flag to check if the type is hard
         
         //checking if the chosen difficulty matches the trip difficulty
         //if the chosen difficulty is easy
@@ -684,58 +610,58 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
             }
         }
 
-        console.log("easyDiff, medDiff, hardDiff " + easyDiff + medDiff + hardDiff)
-        console.log("totalDiff " + totalDiff); 
-
-
         //checking if the chosen type matches the trip type
-        /*if(type == "מתאים למשפחות"){
-            console.log("family");
+        // if the chosen type is for families
+        if(type == "מתאים למשפחות"){
             for(t in totalType){
-                if(t == "מאתגר" || t == "מיטיבי לכת"){
-                    isTypeRight = false;
-                    break;   
+                if(totalType[t] == "מאתגר" || totalType[t] == "מיטיבי לכת"){ 
+                    isTypeRightChallenge=true;
+                    isTypeRightHard=true;
+                    break;
+                } else if(totalType[t]=="מתאים למשפחות") isTypeRightFamily=true;
+            }
+            if(isTypeRightFamily==true && isTypeRightChallenge==false && isTypeRightHard==false)
+                isTypeRight = true;
+        }
+        // if the chosen type is for old people
+        else if(type == "מתאים למבוגרים"){
+            for(t in totalType){
+                if(totalType[t] == "מאתגר" || totalType[t] == "מיטיבי לכת"){ 
+                    isTypeRightChallenge=true;
+                    isTypeRightHard=true;
+                    break;
+                } else if(totalType[t]=="מתאים למבוגרים") isTypeRightOld=true;
+            }
+            if(isTypeRightOld==true && isTypeRightChallenge==false && isTypeRightHard==false)
+                isTypeRight = true;
+        } 
+        // if the chosen type is challenging  
+        else if(type == "מאתגר"){
+            for(t in totalType){
+                if(totalType[t] == "מיטיבי לכת"){ 
+                    isTypeRightHard=true;
+                    break;
+                } else if(totalType[t]=="מאתגר") isTypeRightChallenge=true;
+            }
+            if(isTypeRightChallenge==true && isTypeRightHard==false)
+                isTypeRight = true;
+        }
+        // if the chosen type is hard
+        else if(type == "מיטיבי לכת"){
+            for(t in totalType){
+                if(totalType[t] == "מיטיבי לכת"){
+                    isTypeRightHard=true;
+                    break;
                 } 
-                else isTypeRight = true;
             }
-        } else if(type == "מתאים למבוגרים"){
-            console.log("old");
-            for(t in totalType){
-                if(t == "מאתגר" || t == "מיטיבי לכת"){
-                    isTypeRight = false;
-                    break;   
-                }
-                else if(t == "מתאים למבוגרים"){
-                    isTypeRight = true;
-                } 
-                else isTypeRight = false;
+            if(isTypeRightHard==true){
+                isTypeRight = true;
             }
-        } else if(type == "מאתגר"){
-            console.log("hard");
-            for(t in totalType){
-                if(t == "מיטיבי לכת"){
-                    isTypeRight = false;
-                    break;   
-                }
-                else if(t == "מאתגר"){
-                    isTypeRight = true;
-                } 
-                else isTypeRight = false;
-            }
-        } else if(type == "מיטיבי לכת"){
-            console.log("very hard");
-            for(t in totalType){
-                if(t == "מיטיבי לכת"){
-                    isTypeRight = true;
-                }
-                else isTypeRight = false;
-            }
-        }*/
-
-        console.log("totalType: " + totalType);
-        console.log("type is: " + isTypeRight);
-
-
+        }
+        else if(type == "ללא"){
+            isTypeRight = true;
+        }
+       
         //if the chosen difficulty and type matches the trip difficulty and type
         if(isTypeRight == true && isDiffRight == true){
             currentRoute = {
@@ -749,16 +675,669 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                 "day_km": kmDay,
                 "trip_difficulty": totalDiff,
                 "trip_sites": totalSites,
-                "trip_type": "tmp",
+                "trip_type": totalType,
                 "trip_description": totalDescription,
                 "daily_sections": dailySectionsArr
             }
+        callback(currentRoute);
         //if the chosen difficulty and type don't match the trip difficulty and type 
         } else {
-            currentRoute = "המסלול אינו תואם לחיפוש שלך";
+            if (isTypeRight == false && isDiffRight == true) {
+                //currentRoute = "המסלול אינו תואם את אופי הטיול שבחרת";
+                callback("typeErr");
+            }
+            else if(isDiffRight == false && isTypeRight == true) {
+                //currentRoute = "המסלול אינו תואם את רמת הקושי שבחרת";
+                callback("diffErr");
+            } else {
+                //currentRoute = "המסלול אינו תואם את אופי הטיול ואת רמת הקושי שבחרת";
+                callback("typeDiffErr");
+            }   
         }
+    }
+}
 
-        //return currentRoute;
+// calculate the full route according to traveler's criteria
+exports.calculateFullRoute = function(area, kmDay, dir, callback){
+    var start;
+    var startPt, endPt, segsArr, accommArr, totalDays;
+
+    // if the trip's diresction is from north to south
+    if(dir == "north"){
+        start = getSegs(callback);
+        // getting the full trip segments and building the trip daily sections
+        function getSegs(callback){
+            segsArr = Segment.find({});
+            segsArr.exec(function(err,segments){
+                var totalKm = 0;
+                for(var i = 0; i<segments.length; i++){
+                    if(segments[i].indx==1) startPt = segments[i].start_pt;
+                    if(segments[i].indx==segments.length) endPt = segments[i].end_pt;                
+                    totalKm += segments[i].total_km;
+                }
+                /*console.log("startPt is: " + startPt);
+                console.log("endPt is: " + endPt);
+                console.log("totalKm: " + totalKm);*/
+                
+                var dailySectionsArr = []; // array of all trip's daily sections
+                var dailySection; // daily section for one day 
+                var totalSites = [], tmpTotalSites = []; // trip's total sites
+                
+                // if the trip's km per day is up to 5 km
+                if(kmDay == 5){
+                    totalDays = segments.length;
+                    //console.log("total days is: " + totalDays);
+                    for(var i = 0; i<totalDays; i++){
+                        dailySection = 
+                        { 
+                            "day_num": i+1,
+                            "date": "",
+                            "start_pt": segments[i].start_pt,
+                            "end_pt": segments[i].end_pt,
+                            "start_coord": segments[i].start_coord,
+                            "end_coord": segments[i].end_coord,
+                            "coord_Array": segments[i].coord_Array,
+                            "total_km": segments[i].total_km,
+                            "area": segments[i].area,
+                            "duration": segments[i].duration,
+                            "difficulty": segments[i].difficulty,
+                            "alert": segments[i].alert,
+                            "accomm":[],
+                            "description": segments[i].description,
+                            "sites": segments[i].sites,
+                            "type": segments[i].type
+                        }
+                        dailySectionsArr.push(dailySection); 
+                        totalSites = tmpTotalSites.concat(segments[i].sites);
+                        tmpTotalSites = totalSites;
+                    }  
+                    addAccomToDailySections(startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback);
+                }
+
+                // if the trip's km per day is 5-10 km
+                if(kmDay == 10){
+                    totalDays = (segments.length)/2;
+                    if(totalDays % 1 != 0) totalDays = parseInt(totalDays) + 1;
+                    //console.log("total days is: " + totalDays);
+                    for(var i = 0, j = 0; i<totalDays; i++, j+=2){
+                        //console.log("inside the " + j + " iteration");
+                        if((segments[j+1]) ==  null) {
+                            dailySection = 
+                            { 
+                                "day_num": i+1,
+                                "date": "",
+                                "start_pt": segments[j].start_pt,
+                                "end_pt": segments[j].end_pt,
+                                "start_coord": segments[j].start_coord,
+                                "end_coord": segments[j].end_coord,
+                                "coord_Array": segments[j].coord_Array,
+                                "total_km": segments[j].total_km,
+                                "area": segments[j].area,
+                                "duration": segments[j].duration,
+                                "difficulty": segments[j].difficulty,
+                                "alert": segments[j].alert,
+                                "accomm":[],
+                                "description": segments[j].description,
+                                "sites": segments[j].sites,
+                                "type": segments[j].type
+                            }
+                        } else { 
+                            // create new daily section coords array
+                            var newCoordArr = (segments[j].coord_Array).concat(segments[j+1].coord_Array);
+                            
+                            //calculate new daily section duration
+                            var durationArr1 = (segments[j].duration).split("-");
+                            var durationArr2 = (segments[j+1].duration).split("-");
+                            var minDuration = parseFloat(durationArr1[0]) + parseFloat(durationArr2[0]);
+                            var maxDuration = parseFloat(durationArr1[1]) + parseFloat(durationArr2[1]);
+                            var newDuration = minDuration + "-" + maxDuration;
+                            
+                            //create new daily section difficulty
+                            var newDiff;
+                            var diffArr = [segments[j].difficulty, segments[j+1].difficulty]; 
+                            if(diffArr[0]=="קשה" || diffArr[1]=="קשה"){ 
+                                newDiff = "קשה"; 
+                            }
+                            else if(diffArr[0]=="בינוני" || diffArr[1]=="בינוני"){ 
+                                    newDiff = "בינוני";
+                            }
+                            else newDiff = "קל"; 
+
+                            // create new daily section alerts
+                            var newAlertsArr = (segments[j].alert).concat(segments[j+1].alert);
+
+                            // create new daily section description
+                            var newDescArr = (segments[j].description).concat(segments[j+1].description).unique(); 
+                            
+                            // create new daily section sites
+                            var newSitesArr = (segments[j].sites).concat(segments[j+1].sites);
+
+                            // create new daily section sites
+                            var newTypeArr = (segments[j].type).concat(segments[j+1].type).unique();
+
+                            // create new daily section total km
+                            var newTotalKm = (segments[j].total_km + segments[j+1].total_km).toFixed(1);
+                            
+                            dailySection = 
+                            { 
+                                "day_num": i+1,
+                                "date": "",
+                                "start_pt": segments[j].start_pt,
+                                "end_pt": segments[j+1].end_pt,
+                                "start_coord": segments[j].start_coord,
+                                "end_coord": segments[j+1].end_coord,
+                                "coord_Array": newCoordArr,
+                                "total_km": newTotalKm,
+                                "area": segments[j].area,
+                                "duration": newDuration,
+                                "difficulty": newDiff,
+                                "alert": newAlertsArr,
+                                "accomm":[],
+                                "description": newDescArr,
+                                "sites": newSitesArr,
+                                "type": newTypeArr
+                            }
+                        }
+                        dailySectionsArr.push(dailySection);
+                        totalSites = tmpTotalSites.concat(newSitesArr);
+                        tmpTotalSites = totalSites;
+                    }
+                    addAccomToDailySections(startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback);
+                }
+
+                // if the trip's km per day is 10-15 km
+                if(kmDay == 15){
+                    totalDays = (segments.length)/3;
+                    if(totalDays % 1 != 0) totalDays = parseInt(totalDays) + 1;
+                    //console.log("total days is: " + totalDays);
+                    for(var i = 0, j = 0; i<totalDays; i++, j+=3){
+                        if(segments[j+1] == null) {
+                            dailySection = 
+                            { 
+                                "day_num": i+1,
+                                "date": "",
+                                "start_pt": segments[j].start_pt,
+                                "end_pt": segments[j].end_pt,
+                                "start_coord": segments[j].start_coord,
+                                "end_coord": segments[j].end_coord,
+                                "coord_Array": segments[j].coord_Array,
+                                "total_km": segments[j].total_km,
+                                "area": segments[j].area,
+                                "duration": segments[j].duration,
+                                "difficulty": segments[j].difficulty,
+                                "alert": segments[j].alert,
+                                "accomm":[],
+                                "description": segments[j].description,
+                                "sites": segments[j].sites,
+                                "type": segments[j].type
+                            }
+                        } else if(segments[j+2] == null){
+                            // create new daily section coords array
+                            var newCoordArr = (segments[j].coord_Array).concat(segments[j+1].coord_Array);
+                            
+                            //calculate new daily section duration
+                            var durationArr1 = (segments[j].duration).split("-");
+                            var durationArr2 = (segments[j+1].duration).split("-");
+                            var minDuration = parseFloat(durationArr1[0]) + parseFloat(durationArr2[0]);
+                            var maxDuration = parseFloat(durationArr1[1]) + parseFloat(durationArr2[1]);
+                            var newDuration = minDuration + "-" + maxDuration;
+                            
+                            //create new daily section difficulty
+                            var newDiff;
+                            var diffArr = [segments[j].difficulty, segments[j+1].difficulty]; 
+                            if(diffArr[0]=="קשה" || diffArr[1]=="קשה"){ 
+                                newDiff = "קשה"; 
+                            }
+                            else if(diffArr[0]=="בינוני" || diffArr[1]=="בינוני"){ 
+                                    newDiff = "בינוני";
+                            }
+                            else newDiff = "קל"; 
+
+                            // create new daily section alerts
+                            var newAlertsArr = (segments[j].alert).concat(segments[j+1].alert);
+
+                            // create new daily section description
+                            var newDescArr = (segments[j].description).concat(segments[j+1].description).unique(); 
+                            
+                            // create new daily section sites
+                            var newSitesArr = (segments[j].sites).concat(segments[j+1].sites);
+
+                            // create new daily section sites
+                            var newTypeArr = (segments[j].type).concat(segments[j+1].type).unique();
+
+                            // create new daily section total km
+                            var newTotalKm = (segments[j].total_km + segments[j+1].total_km).toFixed(1);
+                            
+                            dailySection = 
+                            { 
+                                "day_num": i+1,
+                                "date": "",
+                                "start_pt": segments[j].start_pt,
+                                "end_pt": segments[j+1].end_pt,
+                                "start_coord": segments[j].start_coord,
+                                "end_coord": segments[j+1].end_coord,
+                                "coord_Array": newCoordArr,
+                                "total_km": newTotalKm,
+                                "area": segments[j].area,
+                                "duration": newDuration,
+                                "difficulty": newDiff,
+                                "alert": newAlertsArr,
+                                "accomm":[],
+                                "description": newDescArr,
+                                "sites": newSitesArr,
+                                "type": newTypeArr
+                            }
+                        } else {
+                            var tmpCoordArr = (segments[j].coord_Array).concat(segments[j+1].coord_Array);
+                            var newCoordArr = tmpCoordArr.concat(segments[j+2].coord_Array);
+
+                            //calculate new daily section duration
+                            var durationArr1 = (segments[j].duration).split("-");
+                            var durationArr2 = (segments[j+1].duration).split("-");
+                            var durationArr3 = (segments[j+2].duration).split("-");
+                            var minDuration = parseFloat(durationArr1[0]) + parseFloat(durationArr2[0]) + parseFloat(durationArr3[0]);
+                            var maxDuration = parseFloat(durationArr1[1]) + parseFloat(durationArr2[1]) + parseFloat(durationArr3[1]);
+                            var newDuration = minDuration + "-" + maxDuration;
+                            
+                            //create new daily section difficulty
+                            var newDiff;
+                            var diffArr = [segments[j].difficulty, segments[j+1].difficulty, segments[j+2].difficulty]; 
+                            if(diffArr[0]=="קשה" || diffArr[1]=="קשה" || diffArr[2]=="קשה"){ 
+                                newDiff = "קשה"; 
+                            }
+                            else if(diffArr[0]=="בינוני" || diffArr[1]=="בינוני" || diffArr[2]=="בינוני"){ 
+                                    newDiff = "בינוני";
+                            }
+                            else newDiff = "קל"; 
+                
+                            // create new daily section alerts
+                            var tmpAlertsArr = (segments[j].alert).concat(segments[j+1].alert);
+                            var newAlertsArr = tmpAlertsArr.concat(segments[j+2].alert);
+                            
+                            // create new daily section description
+                            var tmpDescArr = (segments[j].description).concat(segments[j+1].description).unique();
+                            var newDescArr = tmpDescArr.concat(segments[j+2].description).unique(); 
+                            
+                            // create new daily section sites
+                            var tmpSitesArr = (segments[j].sites).concat(segments[j+1].sites);
+                            var newSitesArr = tmpSitesArr.concat(segments[j+2].sites);
+
+                            // create new daily section sites
+                            var tmpTypeArr = (segments[j].type).concat(segments[j+1].type).unique();
+                            var newTypeArr = tmpTypeArr.concat(segments[j+2].type).unique();
+
+                            // create new daily section total km
+                            var newTotalKm = (segments[j].total_km + segments[j+1].total_km + segments[j+2].total_km).toFixed(1);
+                            
+                            dailySection = 
+                            { 
+                                "day_num": i+1,
+                                "date": "",
+                                "start_pt": segments[j].start_pt,
+                                "end_pt": segments[j+2].end_pt,
+                                "start_coord": segments[j].start_coord,
+                                "end_coord": segments[j+2].end_coord,
+                                "coord_Array": newCoordArr,
+                                "total_km": newTotalKm,
+                                "area": segments[j].area,
+                                "duration": newDuration,
+                                "difficulty": newDiff,
+                                "alert": newAlertsArr,
+                                "accomm":[],
+                                "description": newDescArr,
+                                "sites": newSitesArr,
+                                "type": newTypeArr
+                            }
+                        }
+                        dailySectionsArr.push(dailySection);
+                        totalSites = tmpTotalSites.concat(newSitesArr);
+                        tmpTotalSites = totalSites;
+                    }
+                    addAccomToDailySections(startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback);
+                }
+            });
+        } 
+    } 
+    // if the trip's diresction is from north to south
+    else if(dir == "south"){
+        start = getSegsSouth(callback);
+        // getting the full trip segments and building the trip daily sections
+        function getSegsSouth(callback){
+            segsArr = Segment.find({});
+            segsArr.exec(function(err,segments){
+                var totalKm = 0;
+                for(var i = 0; i<segments.length; i++){
+                    if(segments[i].indx==1) endPt = segments[i].start_pt;
+                    if(segments[i].indx==segments.length) startPt = segments[i].end_pt;                
+                    totalKm += segments[i].total_km;
+                }
+                /*console.log("startPt is: " + startPt);
+                console.log("endPt is: " + endPt);
+                console.log("totalKm: " + totalKm);*/
+                
+                var dailySectionsArr = []; // array of all trip's daily sections
+                var dailySection; // daily section for one day 
+                var totalSites = [], tmpTotalSites = []; // trip's total sites
+                
+                // if the trip's km per day is up to 5 km
+                if(kmDay == 5){
+                    totalDays = segments.length;
+                    //console.log("total days is: " + totalDays);
+                    for(var i = 0, j = (segments.length)-1; i < totalDays; i++, j--){
+                        dailySection = 
+                        { 
+                            "day_num": i+1,
+                            "date": "",
+                            "start_pt": segments[j].end_pt,
+                            "end_pt": segments[j].start_pt,
+                            "start_coord": segments[j].end_coord,
+                            "end_coord": segments[j].start_coord,
+                            "coord_Array": segments[j].coord_Array,
+                            "total_km": segments[j].total_km,
+                            "area": segments[j].area,
+                            "duration": segments[j].duration,
+                            "difficulty": segments[j].difficulty,
+                            "alert": segments[j].alert,
+                            "accomm":[],
+                            "description": segments[j].description,
+                            "sites": segments[j].sites,
+                            "type": segments[j].type
+                        }
+                        dailySectionsArr.push(dailySection); 
+                        totalSites = tmpTotalSites.concat(segments[j].sites);
+                        tmpTotalSites = totalSites;
+                    }  
+                    addAccomToDailySections(startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback);
+                }
+
+                // if the trip's km per day is 5-10 km
+                if(kmDay == 10){
+                    totalDays = (segments.length)/2;
+                    if(totalDays % 1 != 0) totalDays = parseInt(totalDays) + 1;
+                    //console.log("total days is: " + totalDays);
+                    for(var i = 0, j = (segments.length)-1; i<totalDays; i++, j-=2){
+                        if((segments[j-1]) ==  null) {
+                            dailySection = 
+                            { 
+                                "day_num": i+1,
+                                "date": "",
+                                "start_pt": segments[j].end_pt,
+                                "end_pt": segments[j].start_pt,
+                                "start_coord": segments[j].end_coord,
+                                "end_coord": segments[j].start_coord,
+                                "coord_Array": segments[j].coord_Array,
+                                "total_km": segments[j].total_km,
+                                "area": segments[j].area,
+                                "duration": segments[j].duration,
+                                "difficulty": segments[j].difficulty,
+                                "alert": segments[j].alert,
+                                "accomm":[],
+                                "description": segments[j].description,
+                                "sites": segments[j].sites,
+                                "type": segments[j].type
+                            }
+                        } else {
+                            // create new daily section coords array
+                            var newCoordArr = (segments[j].coord_Array).concat(segments[j-1].coord_Array);
+                            
+                            //calculate new daily section duration
+                            var durationArr1 = (segments[j].duration).split("-");
+                            var durationArr2 = (segments[j-1].duration).split("-");
+                            var minDuration = parseFloat(durationArr1[0]) + parseFloat(durationArr2[0]);
+                            var maxDuration = parseFloat(durationArr1[1]) + parseFloat(durationArr2[1]);
+                            var newDuration = minDuration + "-" + maxDuration;
+                            
+                            //create new daily section difficulty
+                            var newDiff;
+                            var diffArr = [segments[j].difficulty, segments[j-1].difficulty]; 
+                            if(diffArr[0]=="קשה" || diffArr[1]=="קשה"){ 
+                                newDiff = "קשה"; 
+                            }
+                            else if(diffArr[0]=="בינוני" || diffArr[1]=="בינוני"){ 
+                                    newDiff = "בינוני";
+                            }
+                            else newDiff = "קל"; 
+
+                            // create new daily section alerts
+                            var newAlertsArr = (segments[j].alert).concat(segments[j-1].alert);
+
+                            // create new daily section description
+                            var newDescArr = (segments[j].description).concat(segments[j-1].description).unique();
+                            
+                            // create new daily section sites
+                            var newSitesArr = (segments[j].sites).concat(segments[j-1].sites);
+
+                            // create new daily section sites
+                            var newTypeArr = (segments[j].type).concat(segments[j-1].type).unique();
+
+                            // create new daily section total km
+                            var newTotalKm = (segments[j].total_km + segments[j-1].total_km).toFixed(1);
+
+                            dailySection = 
+                            { 
+                                "day_num": i+1,
+                                "date": "",
+                                "start_pt": segments[j].end_pt,
+                                "end_pt": segments[j-1].start_pt,
+                                "start_coord": segments[j].end_coord,
+                                "end_coord": segments[j-1].start_coord,
+                                "coord_Array": newCoordArr,
+                                "total_km": newTotalKm,
+                                "area": segments[j].area,
+                                "duration": newDuration,
+                                "difficulty": newDiff,
+                                "alert": newAlertsArr,
+                                "accomm":[],
+                                "description": newDescArr,
+                                "sites": newSitesArr,
+                                "type": newTypeArr
+                            }
+                        }
+                        dailySectionsArr.push(dailySection);
+                        totalSites = tmpTotalSites.concat(newSitesArr);
+                        tmpTotalSites = totalSites;
+                    }
+                    addAccomToDailySections(startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback);
+                }
+
+                // if the trip's km per day is 10-15 km
+                if(kmDay == 15){
+                    totalDays = (segments.length)/3;
+                    if(totalDays % 1 != 0) totalDays = parseInt(totalDays) + 1;
+                    //console.log("total days is: " + totalDays);
+                    for(var i = 0, j = (segments.length)-1; i<totalDays; i++, j-=3){
+                        if((segments[j-1]) ==  null) {
+                            dailySection = 
+                            { 
+                                "day_num": i+1,
+                                "date": "",
+                                "start_pt": segments[j].end_pt,
+                                "end_pt": segments[j].start_pt,
+                                "start_coord": segments[j].end_coord,
+                                "end_coord": segments[j].start_coord,
+                                "coord_Array": segments[j].coord_Array,
+                                "total_km": segments[j].total_km,
+                                "area": segments[j].area,
+                                "duration": segments[j].duration,
+                                "difficulty": segments[j].difficulty,
+                                "alert": segments[j].alert,
+                                "accomm":[],
+                                "description": segments[j].description,
+                                "sites": segments[j].sites,
+                                "type": segments[j].type
+                            }
+                        } else if((segments[j-2]) ==  null){
+                            // create new daily section coords array
+                            var newCoordArr = (segments[j].coord_Array).concat(segments[j-1].coord_Array);
+                            
+                            //calculate new daily section duration
+                            var durationArr1 = (segments[j].duration).split("-");
+                            var durationArr2 = (segments[j-1].duration).split("-");
+                            var minDuration = parseFloat(durationArr1[0]) + parseFloat(durationArr2[0]);
+                            var maxDuration = parseFloat(durationArr1[1]) + parseFloat(durationArr2[1]);
+                            var newDuration = minDuration + "-" + maxDuration;
+                            
+                            //create new daily section difficulty
+                            var newDiff;
+                            var diffArr = [segments[j].difficulty, segments[j-1].difficulty]; 
+                            if(diffArr[0]=="קשה" || diffArr[1]=="קשה"){ 
+                                newDiff = "קשה"; 
+                            }
+                            else if(diffArr[0]=="בינוני" || diffArr[1]=="בינוני"){ 
+                                    newDiff = "בינוני";
+                            }
+                            else newDiff = "קל"; 
+
+                            // create new daily section alerts
+                            var newAlertsArr = (segments[j].alert).concat(segments[j-1].alert);
+
+                            // create new daily section description
+                            var newDescArr = (segments[j].description).concat(segments[j-1].description).unique();
+                            
+                            // create new daily section sites
+                            var newSitesArr = (segments[j].sites).concat(segments[j-1].sites);
+
+                            // create new daily section sites
+                            var newTypeArr = (segments[j].type).concat(segments[j-1].type).unique();
+
+                            // create new daily section total km
+                            var newTotalKm = (segments[j].total_km + segments[j-1].total_km).toFixed(1);
+
+                            dailySection = 
+                            { 
+                                "day_num": i+1,
+                                "date": "",
+                                "start_pt": segments[j].end_pt,
+                                "end_pt": segments[j-1].start_pt,
+                                "start_coord": segments[j].end_coord,
+                                "end_coord": segments[j-1].start_coord,
+                                "coord_Array": newCoordArr,
+                                "total_km": newTotalKm,
+                                "area": segments[j].area,
+                                "duration": newDuration,
+                                "difficulty": newDiff,
+                                "alert": newAlertsArr,
+                                "accomm":[],
+                                "description": newDescArr,
+                                "sites": newSitesArr,
+                                "type": newTypeArr
+                            }
+                        } else {
+                            // create new daily section coords array
+                            var tmpCoordArr = (segments[j].coord_Array).concat(segments[j-1].coord_Array);
+                            var newCoordArr = tmpCoordArr.concat(segments[j-2].coord_Array);
+
+                            //calculate new daily section duration
+                            var durationArr1 = (segments[j].duration).split("-");
+                            var durationArr2 = (segments[j-1].duration).split("-");
+                            var durationArr3 = (segments[j-2].duration).split("-");
+                            var minDuration = parseFloat(durationArr1[0]) + parseFloat(durationArr2[0]) + parseFloat(durationArr3[0]);
+                            var maxDuration = parseFloat(durationArr1[1]) + parseFloat(durationArr2[1]) + parseFloat(durationArr3[1]);
+                            var newDuration = minDuration + "-" + maxDuration;
+                            
+                            //create new daily section difficulty
+                            var newDiff;
+                            var diffArr = [segments[j].difficulty, segments[j-1].difficulty, segments[j-2].difficulty]; 
+                            if(diffArr[0]=="קשה" || diffArr[1]=="קשה" || diffArr[2]=="קשה"){ 
+                                newDiff = "קשה"; 
+                            }
+                            else if(diffArr[0]=="בינוני" || diffArr[1]=="בינוני" || diffArr[2]=="בינוני"){ 
+                                    newDiff = "בינוני";
+                            }
+                            else newDiff = "קל"; 
+
+                            // create new daily section alerts
+                            var tmpAlertsArr = (segments[j].alert).concat(segments[j-1].alert);
+                            var newAlertsArr = tmpAlertsArr.concat(segments[j-2].alert);
+                            
+                            // create new daily section description
+                            var tmpDescArr = (segments[j].description).concat(segments[j-1].description).unique();
+                            var newDescArr = tmpDescArr.concat(segments[j-2].description).unique(); 
+                            
+                            // create new daily section sites
+                            var tmpSitesArr = (segments[j].sites).concat(segments[j-1].sites);
+                            var newSitesArr = tmpSitesArr.concat(segments[j-2].sites);
+
+                            // create new daily section sites
+                            var tmpTypeArr = (segments[j].type).concat(segments[j-1].type).unique();
+                            var newTypeArr = tmpTypeArr.concat(segments[j-2].type).unique();
+
+                            // create new daily section total km
+                            var newTotalKm = (segments[j].total_km + segments[j-1].total_km + segments[j-2].total_km).toFixed(1);
+
+                            dailySection = 
+                            { 
+                                "day_num": i+1,
+                                "date": "",
+                                "start_pt": segments[j].end_pt,
+                                "end_pt": segments[j-2].start_pt,
+                                "start_coord": segments[j].end_coord,
+                                "end_coord": segments[j-2].start_coord,
+                                "coord_Array": newCoordArr,
+                                "total_km": newTotalKm,
+                                "area": segments[j].area,
+                                "duration": newDuration,
+                                "difficulty": newDiff,
+                                "alert": newAlertsArr,
+                                "accomm":[],
+                                "description": newDescArr,
+                                "sites": newSitesArr,
+                                "type": newTypeArr
+                            }
+                        }
+                        dailySectionsArr.push(dailySection);
+                        totalSites = tmpTotalSites.concat(newSitesArr);
+                        tmpTotalSites = totalSites;
+                    }
+                    addAccomToDailySections(startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback);
+                }
+            });
+        }
+    }
+
+    function addAccomToDailySections(startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback){
+        var accommPointsArr = [];
+        for(i = 0; i<dailySectionsArr.length; i++){
+            accommPointsArr.push(dailySectionsArr[i].end_pt);
+        }
+        // get all of the accommodation lists for all of daily section's end points
+        var getAccom = Accomm.find({'point_name':{'$in' : accommPointsArr}});
+        getAccom.exec(function(err,accommArr){
+            addToDaily(accommArr,startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback);
+        });  
+
+        // adding the accommodation lists to daily sections array
+        function addToDaily(accommArr,startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback){
+            for(j = 0; j<dailySectionsArr.length; j++){
+                for(k = 0; k<accommArr.length; k++){
+                    if(dailySectionsArr[j].end_pt == accommArr[k].point_name){
+                        dailySectionsArr[j].accomm = accommArr[k].accomm_list;
+                    }
+                    //console.log("for daily section end point " + dailySectionsArr[j].end_pt + " the accomm list is: " + dailySectionsArr[j].accomm);
+                }
+            }
+            //callback(dailySectionsArr);
+            buildRoute(startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback);
+        }
+    }
+
+    function buildRoute(startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback){
+        var totalDescription = "שביל ישראל הוא הטרק של המדינה, שביל המזמין אתכם לחוות את הארץ דרך כל הגוף וכל החושים. מסע אלף הקילומטרים של שביל ישראל יוביל אתכם מדן ועד אילת, ובדרך תטעמו מכל טוב הארץ: מהירוק והמים של מקורות הירדן, הרי הגליל, הכנרת, הכרמל ומרכז הארץ, השקט של המדבר ועד הצבעים של הרי אילת וים סוף."
+        var currentRoute = {
+            "area": area,
+            "trip_start_pt": startPt,
+            "trip_end_pt": endPt,
+            "start_date": "",
+            "end_date": "",
+            "days_num": totalDays,
+            "trip_km": totalKm,
+            "day_km": kmDay,
+            "trip_difficulty": "",
+            "trip_sites": totalSites,
+            "trip_type": "",
+            "trip_description": totalDescription,
+            "daily_sections": dailySectionsArr
+        }  
         callback(currentRoute);
     }
 }

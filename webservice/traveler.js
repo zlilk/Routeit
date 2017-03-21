@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
-var schema = mongoose.Schema;
+require('mongoose-double')(mongoose);
+var SchemaTypes = mongoose.Schema.Types;
 
+var schema = mongoose.Schema;
 var travelerSchema = new schema({
     full_name: String,
     image: String,
@@ -35,7 +37,7 @@ var travelerSchema = new schema({
                 coord_Array: [{
                     lat: String,
                     lng: String
-                }]
+                }],
                 total_km: {
                     type: SchemaTypes.Double
                 },                
@@ -47,6 +49,10 @@ var travelerSchema = new schema({
                     accomm_name: String,
                     phone: String
                 }],
+                chosen_accomm: {
+                    accomm_name: String,
+                    phone: String
+                },
                 description: [String],
                 sites: [String],
                 type: [String]
@@ -83,7 +89,7 @@ var travelerSchema = new schema({
                 coord_Array: [{
                     lat: String,
                     lng: String
-                }]
+                }],
                 total_km: {
                     type: SchemaTypes.Double
                 },                
@@ -95,6 +101,10 @@ var travelerSchema = new schema({
                     accomm_name: String,
                     phone: String
                 }],
+                 chosen_accomm: {
+                    accomm_name: String,
+                    phone: String
+                },
                 description: [String],
                 sites: [String],
                 type: [String]
@@ -131,7 +141,7 @@ var travelerSchema = new schema({
                 coord_Array: [{
                     lat: String,
                     lng: String
-                }]
+                }],
                 total_km: {
                     type: SchemaTypes.Double
                 },                
@@ -143,6 +153,10 @@ var travelerSchema = new schema({
                     accomm_name: String,
                     phone: String
                 }],
+                 chosen_accomm: {
+                    accomm_name: String,
+                    phone: String
+                },
                 description: [String],
                 sites: [String],
                 type: [String]
