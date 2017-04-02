@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html ng-app="userProfile">
+    <head>
+        <meta charset="utf-8">
+        <meta name="google-signin-client_id" content="296256466166-pdh58rh53nihcc5tfh184vmautajqsup.apps.googleusercontent.com">
+        <title>User Profile</title>
+        <link href='https://fonts.googleapis.com/css?family=Alef' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/style.css">
+        <script src="https://apis.google.com/js/platform.js" async defer></script>   
+    </head>
+    <body>
+        <nav> 
+            <a id = "personalProfile" href="#"> personalProfile </a>
+            <a id = "dailyRoute" href="#"> dailyRoute </a>
+            <a id = "detailedPlan" href="#"> detailedPlan </a> 
+            <div class = "clear"> </div>
+        </nav>
+        <main ng-controller = "ProfileController">
+            <section id ="userProfile">
+                <a href ="#" class="btn btn-default" id = "signOut" onclick="signOut();">התנתק</a>
+                <h4 id = "userName"> <b> {{name}} </b> </h1>
+                <p> <img id = "userPic" src={{img}}> </p>
+            </section>
+            <scection id = "planRoute"> 
+                <a id = "planRouteButton" href="routeform.html"> תכנון מסלול חדש </a> 
+            </scection>
+            <section id = "userRoutes"> 
+                <button id = "myRoutes" ng-click="showMyRoutes()"> המסלולים שלי </button>
+                <button id = "prevRoutes" ng-click="showRoutesHistory()"> הסטוריה </button>
+                <!-- <section id = "content" ng-bind-html="content1"> 
+                 <p ng-repeat> </p> 
+                </section> -->
+            </section>
+            <section id = "content"> 
+                <!-- <p ng-repeat> </p> -->
+            </section>
+        </main>
+        <footer> 
+            <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
+            <div class = "clear"> </div>
+        </footer>
+        <script>
+            function signOut() {
+                var auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                    console.log('User signed out.');
+                });
+                window.location.assign("");
+            }
+        </script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+        <script src="js/lib/angular/angular.min.js"></script>
+        <script src="js/userprofile.js"></script>
+    </body>
+ </html>

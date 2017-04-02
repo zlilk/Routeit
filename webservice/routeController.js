@@ -14,6 +14,28 @@ Array.prototype.unique = function() {
     return a;
 };
 
+// gets all of the areas and their start points
+exports.getSegmentsStartPt = function(callback){
+    var segsStratPt = Segment.find({}).select('area start_pt');
+    segsStratPt.exec(function(err,segments){
+        var startPtByArea = [{"area": "כל השביל", points: []}];
+        for(var i = 0; i<segments.length; i++){
+            var duplicate = false;
+            for(var j=0; j<startPtByArea.length; j++){
+                if(segments[i].area == startPtByArea[j].area){
+                  duplicate = true;
+                  startPtByArea[j].points.push({"point_name": segments[i].start_pt, "point_id": i}); 
+                }
+              }
+            if(!duplicate){
+                var areaStartPts = {"area": segments[i].area, "points": [{"point_name": segments[i].start_pt, "point_id": i}]};
+                startPtByArea.push(areaStartPts);
+            }  
+        }  
+        callback(startPtByArea);
+    });     
+}
+
 // calculate suggested route according to traveler's crtieria  
 exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, type, callback){
     var numOfDailySections, maxTripTotalKm, numOfSegs;

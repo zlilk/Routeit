@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html ng-app="suggestedRoute">
+    <head>
+        <meta charset="utf-8">
+        <meta name="google-signin-client_id" content="296256466166-pdh58rh53nihcc5tfh184vmautajqsup.apps.googleusercontent.com">
+        <title>Suggested Route</title>
+        <link href='https://fonts.googleapis.com/css?family=Alef' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/style.css">
+        <script src="https://apis.google.com/js/platform.js" async defer></script>   
+    </head>
+    <body>
+        <nav> 
+            <a id = "personalProfile" href="#"> personalProfile </a>
+            <a id = "dailyRoute" href="#"> dailyRoute </a>
+            <a id = "detailedPlan" href="#"> detailedPlan </a> 
+            <div class = "clear"> </div>
+        </nav>
+        <header id="suggestedHeader"> 
+        	<h1> המסלול שלך </h1>
+        </header>
+        <main ng-controller = "SuggestedController">
+            <section id="suggestedMap"> </section>
+            <section id="routeOverview">
+            	<span> אזור </span> {{area}} <br>
+            	<span> נקודת התחלה: </span> {{tripStartPt}} <br>
+            	<span> נקודת סיום: </span> {{tripEndPt}} <br>
+            	<span> מספר ימים: </span> {{tripDaysNum}} <br>
+            	<span> מספר ק"מ: </span> {{tripKm}} <br>
+            	<span> רמת קושי: </span> {{tripDiff}} <br>
+            	אופי הטיול: <span ng-repeat = "type in tripType"> {{type}}, </span> <br>
+            	אתרים בדרך: <span ng-repeat = "site in tripSites"> {{site}}, </span>
+            	<button ng-click="addRoute()"> + </button>
+            	<button ng-click="showHide()"> ^ </button>
+            	<section id="dailySecs" class = "hidden"> </section>
+            </section>
+        </main>
+        <footer> 
+            <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
+            <div class = "clear"> </div>
+        </footer>
+        <script>
+            function signOut() {
+                var auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                    console.log('User signed out.');
+                });
+                window.location.assign("");
+            }
+        </script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+        <script src="js/lib/angular/angular.min.js"></script>
+        <script src="js/suggested.js"></script>
+    </body>
+ </html>

@@ -11,7 +11,7 @@ exports.createTraveler = function(mail, name, pic, callback){
         // checking if user already exists
         for(var i = 0; i<mails.length; i++)
         {
-            if(mails[i].email == mail) return callback("exists");   
+            if(mails[i].email == mail) return callback("userExists");   
         }
         var newUser = new Traveler({
                 full_name: name,
@@ -22,13 +22,15 @@ exports.createTraveler = function(mail, name, pic, callback){
                 my_routes: []
         }); 
         newUser.save();
-        callback("newuser"); 
+        callback("newUser"); 
     });
 }
 
 // adding sugeested route to traveler's 'my routes'
 exports.addRouteToTraveler = function(route, id, mail, callback){ 
-  //console.log(route);
+  //var route = JSON.stringify(route1);
+  //var route = JSON.parse(route1);
+  console.log(route);
   var dailySectionsArr = []; //contains trip's daily section
   for(var i = 0; i<route.daily_sections.length; i++){
     var coordArray = []; //contains all of daily section's coords
@@ -223,4 +225,9 @@ exports.getAllPreviousRoutes = function(mail, callback){
       if(err) callback("prevRoutesNotFound");
       callback(routes);
     });
+}
+
+exports.test = function(json, callback){
+ //var myJson = JSON.parse(json);
+  console.log(json);
 }

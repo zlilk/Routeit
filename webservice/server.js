@@ -14,18 +14,31 @@ app.use(function(req,res,next) {
     next();
 });
 
+var bodyParser = require('body-parser');
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true }));
+
+//app.use(express.bodyParser({limit: '50mb'}));
+
 // routeController functions
 app.get('/calculate/:ar/:km/:dr/:td/:sp/:df/:tp', function(req,res){
     Segment.calculateRoute(req.params.ar,req.params.km,req.params.dr,req.params.td,req.params.sp,req.params.df,req.params.tp,function(data){
-        var id = 3;
-        Traveler.addRouteToTraveler(data, id, "zlil@gmail.com",function(data){
+        //var id = 3;
+        res.json(data);
+        /*Traveler.addRouteToTraveler(data, id, "nitsan.ll13@gmail.com",function(data){
               res.json(data);
-        });
+        });*/
     });
 });
 
 app.get('/calculateFull/:ar/:km/:dr', function(req,res){
     Segment.calculateFullRoute(req.params.ar,req.params.km,req.params.dr,function(data){
+      res.json(data);
+    });
+});
+
+app.get('/getStartPts', function(req,res){
+    Segment.getSegmentsStartPt(function(data){
       res.json(data);
     });
 });
@@ -37,8 +50,10 @@ app.get('/createTraveler/:ml/:fn/:pi', function(req,res){
     });
 }); 
 
-app.get('/addRoute/:rt/:ml', function(req,res){
-    Traveler.addRouteToTraveler(req.params.rt, req.params.ml, callback);
+app.get('/addRoute/:rt/:id/:ml', function(req,res){
+    Traveler.addRouteToTraveler(req.params.rt, req.params.id, req.params.ml, function(data){
+      res.json(data); 
+    });
 });
 
 app.get('/updateCurrent/:ml/:id', function(req,res){
@@ -85,6 +100,14 @@ app.get('/getpreRoutes/:ml', function(req,res){
       res.json(data); 
     });
 });
+
+app.post('/zibi', function(req,res){
+    console.log(req.body.bla);
+    Traveler.test(req.body.bla, function(data){
+      res.json(data); 
+    });
+});
+
 
 app.listen(port);
 console.log("service is lstening on port " + port);

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html ng-app="routeForm">
+    <head>
+        <meta charset="utf-8">
+        <meta name="google-signin-client_id" content="296256466166-pdh58rh53nihcc5tfh184vmautajqsup.apps.googleusercontent.com">
+        <title> create route </title>
+        <link href='https://fonts.googleapis.com/css?family=Alef' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/style.css">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+        <script src="https://apis.google.com/js/platform.js" async defer></script>
+        <style> body{ direction: rtl; } </style>
+    </head>
+    <body>
+        <nav> 
+            <a id = "personalProfile" href="#"> personalProfile </a>
+            <a id = "dailyRoute" href="#"> dailyRoute </a>
+            <a id = "detailedPlan" href="#"> detailedPlan </a> 
+            <div class = "clear"> </div>
+        </nav>
+        <main ng-controller = "FormController">
+            <form id = "routeForm">
+                <label> איזור בארץ: </label>
+                <select name="area" ng-model="area" ng-change="checkArea(area.area)" ng-options="area.area for area in startPts">
+                </select><br>
+                <label> כיוון: </label>
+                <select name="dir" ng-model="dir" ng-change="dirValue(dir, area)">
+                    <option value="north">מצפון לדרום</option>
+                    <option value="south">מדרום לצפון</option>
+                </select><br>
+                <label> נקודת פתיחה: </label>
+                <select class="disable" name="sPoint" ng-model="sPoint" ng-options="point.point_name for point in area.points">
+                </select><br>
+                <label> מספר ק"מ ליום: </label>
+                <select name="km" ng-model="km">
+                    <option value="5"> עד 5 ק"מ ביום</option>
+                    <option value="10"> 5-10 ק"מ ביום</option>
+                    <option value="15"> 10-15 ק"מ ביום</option>
+                </select><br>
+                <label> מספר ימים: </label> 
+                <input type="number" class="disable" name="daysNum" ng-model="daysNum" value="1" min="1"><br>
+                <label>  רמת קושי: </label>
+                <select name="diff" ng-model="diff" class="disable">
+                    <option value="קל"> קל </option>
+                    <option value="בינוני"> בינוני </option>
+                    <option value="קשה"> קשה </option>
+                </select><br>
+                <label>  אופי הטיול: </label>
+                <select name="type" ng-model="type" class="disable">
+                    <option value="ללא"> ללא </option>
+                    <option value="מתאים למשפחות"> מתאים למשפחות </option>
+                    <option value="מאתגר"> מאתגר </option>
+                    <option value="מיטיבי לכת"> למיטיבי לכת </option>
+                </select><br>
+                <button type="submit" ng-click="calcRoute(area.area, dir, sPoint.point_name, km, daysNum, diff, type)"> חשב </button> 
+            </form>
+        </main>
+        <footer> 
+            <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
+            <div class = "clear"> </div>
+        </footer>
+        <script>
+            function signOut() {
+                var auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                    console.log('User signed out.');
+                });
+                window.location.assign("");
+            }
+        </script>
+        <script src="js/lib/angular/angular.min.js"></script>
+        <script src="js/routeform.js"></script>
+    </body>
+ </html>
