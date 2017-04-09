@@ -21,13 +21,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //app.use(express.bodyParser({limit: '50mb'}));
 
 // routeController functions
-app.get('/calculate/:ar/:km/:dr/:td/:sp/:df/:tp', function(req,res){
+app.get('/calculate/:ar/:km/:dr/:td/:sp/:df/:tp/:ml', function(req,res){
     Segment.calculateRoute(req.params.ar,req.params.km,req.params.dr,req.params.td,req.params.sp,req.params.df,req.params.tp,function(data){
-        //var id = 3;
-        res.json(data);
-        /*Traveler.addRouteToTraveler(data, id, "nitsan.ll13@gmail.com",function(data){
-              res.json(data);
-        });*/
+        if(data == "segmentsErr" || data == "typeErr" || data == "diffErr" || data == "typeDiffErr") {res.json(data);}
+        else {
+          Traveler.addRouteToSuggested(data, req.params.ml,function(data){
+            res.json(data);
+          });
+        }
     });
 });
 
@@ -50,8 +51,8 @@ app.get('/createTraveler/:ml/:fn/:pi', function(req,res){
     });
 }); 
 
-app.get('/addRoute/:rt/:id/:ml', function(req,res){
-    Traveler.addRouteToTraveler(req.params.rt, req.params.id, req.params.ml, function(data){
+app.get('/addRoute/:id/:ml', function(req,res){
+    Traveler.addRouteToTraveler(req.params.id, req.params.ml, function(data){
       res.json(data); 
     });
 });
@@ -63,8 +64,10 @@ app.get('/updateCurrent/:ml/:id', function(req,res){
 }); 
 
 app.get('/updateDates/:ml/:id/:sd/:dn/:fr/:st', function(req,res){
-    var d1 = new Date("March 29, 2017 11:13:00");
-    Traveler.updateTripDates(req.params.ml, req.params.id, d1, req.params.dn, req.params.fr, req.params.st, function(data){
+    console.log("before sending: " + req.params.sd);
+    var date =  new Date(req.params.sd);
+    date.setHours(14);
+    Traveler.updateTripDates(req.params.ml, req.params.id, date, req.params.dn, req.params.fr, req.params.st, function(data){
       res.json(data); 
     });
 });
@@ -95,19 +98,11 @@ app.get('/getMyRoutes/:ml', function(req,res){
     });
 });
 
-app.get('/getpreRoutes/:ml', function(req,res){
+app.get('/getPrevRoutes/:ml', function(req,res){
     Traveler.getAllPreviousRoutes(req.params.ml, function(data){
       res.json(data); 
     });
 });
-
-app.post('/zibi', function(req,res){
-    console.log(req.body.bla);
-    Traveler.test(req.body.bla, function(data){
-      res.json(data); 
-    });
-});
-
 
 app.listen(port);
 console.log("service is lstening on port " + port);

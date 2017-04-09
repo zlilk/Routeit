@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html ng-app="dailyRoute">
+    <head>
+        <meta charset="utf-8">
+        <meta name="google-signin-client_id" content="296256466166-pdh58rh53nihcc5tfh184vmautajqsup.apps.googleusercontent.com">
+        <title>Daily Route</title>
+        <link href='https://fonts.googleapis.com/css?family=Alef' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/style.css">
+        <script src="https://apis.google.com/js/platform.js" async defer></script>   
+    </head>
+    <body ng-controller = "dailyController">
+        <nav> 
+            <a id = "personalProfile" href="http://localhost:8080/userprofile.html"> personalProfile </a>
+            <a id = "dailyRoute" href="http://localhost:8080/dailyRoute.html"> dailyRoute </a>
+            <a id = "detailedPlan" href="#"> detailedPlan </a> 
+            <div class = "clear"> </div>
+        </nav>
+        <header id="dailyHeader"> 
+            <h1> מסלול יומי </h1>
+            <h1>{{currentDate}}</h1>
+        </header>
+        <main id="dailyMain">
+            <section id="startEnd"> 
+                <span> מוצא {{start}} </span> 
+                <span> סיום: {{end}} </span> <br>
+                <span> משך: {{duration}} שעות </span>
+            </section>
+            <section id ="routeDesc">
+                <h3>תיאור המסלול</h3>
+                <p ng-repeat = "desc in descArr">{{desc}}</p>
+                <p>רמת קושי: {{diff}}</p>
+            </section>
+            <section id="dailyMap"> </section>
+            <section id="dailySites">
+                <h3>אתרים בדרך</h3>
+                <p ng-repeat = "site in sitesArr">{{site}}</p>
+            </section>
+            <section id ="dailyAccomm">
+                <h3>מקום לינה</h3>
+                <p>{{accommName}}</p>
+                <p>{{accommPhone}}</p>
+            </section>
+            <section id="dailyAlerts">
+                <h3>התראות</h3>
+                <p ng-repeat = "alert in alertsArr">{{alert}}</p>
+            </section>
+        </main>
+        <footer> 
+            <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
+            <div class = "clear"> </div>
+        </footer>
+        <script>
+            function signOut() {
+                var auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                    console.log('User signed out.');
+                });
+                window.location.assign("");
+            }
+        </script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+        <script src="js/lib/angular/angular.min.js"></script>
+        <script src="js/dailyroute.js"></script>
+    </body>
+ </html>

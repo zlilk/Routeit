@@ -57,6 +57,7 @@ var travelerSchema = new schema({
     full_name: String,
     image: String,
     email: {type:String, index:1, required:true, unique:true},
+    suggested_route: route,
     current_route_id: Number,
     previous_routes: [route],
     my_routes: [route]

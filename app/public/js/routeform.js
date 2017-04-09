@@ -63,10 +63,12 @@ routeForm.controller('FormController', ['$scope', '$rootScope', '$http',function
     //sendind the chosen criteria in order to calculate the route
     $scope.calcRoute = function(area, dir, sPoint, km, daysNum, diff, type){
         console.log(area + "," + dir + "," + sPoint + "," + km + "," + daysNum  + "," + diff  + "," + type);
-        $http.get("http://localhost:3000/calculate/" + area+ "/" + km + "/" + dir + "/" + daysNum + "/" + sPoint + "/" + diff + "/" + type).success(function(route){
+        var email = localStorage.getItem("email");
+        $http.get("http://localhost:3000/calculate/" + area+ "/" + km + "/" + dir + "/" + daysNum + "/" + sPoint + "/" + diff + "/" + type + "/" + email).success(function(route){
             var routeStr = JSON.stringify(route);
             localStorage.setItem("suggestedRoute", routeStr);
-            window.location.assign("http://localhost:8080/suggested.html");     
+            console.log(localStorage.getItem("suggestedRoute"));
+            window.location.assign("http://localhost:8080/suggested.html");
         });
     };
 }]);

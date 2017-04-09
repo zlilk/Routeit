@@ -12,22 +12,24 @@
     </head>
     <body>
         <nav> 
-            <a id = "personalProfile" href="#"> personalProfile </a>
+            <a id = "personalProfile" href="http://localhost:8080/userprofile.html"> personalProfile </a>
             <a id = "dailyRoute" href="#"> dailyRoute </a>
             <a id = "detailedPlan" href="#"> detailedPlan </a> 
             <div class = "clear"> </div>
         </nav>
         <header id="suggestedHeader"> 
-        	<h1> המסלול שלך </h1>
+        	<a href="http://localhost:8080/routeform.html"> < </a>
+            <h1> המסלול שלך </h1>
         </header>
-        <main ng-controller = "SuggestedController">
+        <main id="sugMain" ng-controller = "SuggestedController">
             <section id="suggestedMap"> </section>
             <section id="routeOverview">
             	<span> אזור </span> {{area}} <br>
             	<span> נקודת התחלה: </span> {{tripStartPt}} <br>
             	<span> נקודת סיום: </span> {{tripEndPt}} <br>
             	<span> מספר ימים: </span> {{tripDaysNum}} <br>
-            	<span> מספר ק"מ: </span> {{tripKm}} <br>
+                <span> מספר ק"מ ליום: </span> {{tripDayKm}} <br>
+            	<span> מספר ק"מ כולל: </span> {{tripKm}} <br>
             	<span> רמת קושי: </span> {{tripDiff}} <br>
             	אופי הטיול: <span ng-repeat = "type in tripType"> {{type}}, </span> <br>
             	אתרים בדרך: <span ng-repeat = "site in tripSites"> {{site}}, </span>

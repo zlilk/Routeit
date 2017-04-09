@@ -27,82 +27,88 @@ exports.createTraveler = function(mail, name, pic, callback){
 }
 
 // adding sugeested route to traveler's 'my routes'
-exports.addRouteToTraveler = function(route, id, mail, callback){ 
-  //var route = JSON.stringify(route1);
-  //var route = JSON.parse(route1);
-  console.log(route);
-  var dailySectionsArr = []; //contains trip's daily section
-  for(var i = 0; i<route.daily_sections.length; i++){
-    var coordArray = []; //contains all of daily section's coords
-    var coordArr = route.daily_sections[i].coord_array;
-    for(var j = 0; j<coordArr.length; j++){
-      var coord ={}; //object representing a coord
-      coord.lat = coordArr[j].lat;
-      coord.lng = coordArr[j].lng;
-      coordArray.push(coord);
-    }
-
-    var accommArray = []; //contains all of daily section's accommodation places
-    var acoommArr = route.daily_sections[i].accomm_array; 
-    for(var j = 0; j<acoommArr.length; j++){
-      var accomm = {}; //object representing an accommodation place
-      accomm.accomm_name = acoommArr[j].accomm_name;
-      accomm.phone = acoommArr[j].phone;
-      accommArray.push(accomm);
-    }
-
-    //a trip's daily section
-    var dailySection = { 
-      day_num: route.daily_sections[i].day_num,
-      date: route.daily_sections[i].date,
-      start_pt: route.daily_sections[i].start_pt,
-      end_pt: route.daily_sections[i].end_pt,
-      start_coord: route.daily_sections[i].start_coord,
-      end_coord: route.daily_sections[i].end_coord,
-      coord_array: coordArray,
-      total_km: route.daily_sections[i].total_km,
-      area: route.daily_sections[i].area,
-      duration: route.daily_sections[i].duration,
-      difficulty: route.daily_sections[i].difficulty,
-      alert: route.daily_sections[i].alert,
-      accomm_array: accommArray,
-      chosen_accomm: "",
-      description: route.daily_sections[i].description,
-      sites: route.daily_sections[i].sites,
-      type: route.daily_sections[i].type
-    };
-  dailySectionsArr.push(dailySection);
-  }
-
-  //a route to add to 'my routes'
-  var myRoute = {
-      trip_id: id,
-      area: route.area,
-      trip_start_pt: route.trip_start_pt,
-      trip_end_pt: route.trip_end_pt,
-      start_date: route.start_date,
-      end_date: route.end_date,
-      days_num: route.days_num,
-      trip_km: route.trip_km,
-      day_km: route.day_km,
-      trip_difficulty: route.trip_difficulty,
-      trip_sites: route.trip_sites,
-      trip_type: route.trip_type,
-      trip_description: route.trip_description,
-      daily_sections: dailySectionsArr
-    };
-    
+exports.addRouteToTraveler = function(id, mail, callback){   
     //pushing myRoute to traveler's 'my routes'
-    var query = Traveler.findOneAndUpdate({email: mail}, {$push: {my_routes: myRoute}});
-    query.exec(function(err,traveler){
-      if(err) callback("routeNotAdded");	
-      callback("routeAdded");
+    var query = Traveler.findOne({email: mail}).select('suggested_route');
+    query.exec(function(err,sugRoute){
+      if(err) callback("travelerNotFound");
+      //console.log(route.suggested_route.area);
+      var route = sugRoute.suggested_route;
+      var dailySectionsArr = []; //contains trip's daily section
+      for(var i = 0; i<route.daily_sections.length; i++){
+        var coordArray = []; //contains all of daily section's coords
+        var coordArr = route.daily_sections[i].coord_array;
+        for(var j = 0; j<coordArr.length; j++){
+          var coord ={}; //object representing a coord
+          coord.lat = coordArr[j].lat;
+          coord.lng = coordArr[j].lng;
+          coordArray.push(coord);
+        }
+
+        var accommArray = []; //contains all of daily section's accommodation places
+        var acoommArr = route.daily_sections[i].accomm_array; 
+        for(var j = 0; j<acoommArr.length; j++){
+          var accomm = {}; //object representing an accommodation place
+          accomm.accomm_name = acoommArr[j].accomm_name;
+          accomm.phone = acoommArr[j].phone;
+          accommArray.push(accomm);
+        }
+
+        //a trip's daily section
+        var dailySection = { 
+          day_num: route.daily_sections[i].day_num,
+          date: route.daily_sections[i].date,
+          start_pt: route.daily_sections[i].start_pt,
+          end_pt: route.daily_sections[i].end_pt,
+          start_coord: route.daily_sections[i].start_coord,
+          end_coord: route.daily_sections[i].end_coord,
+          coord_array: coordArray,
+          total_km: route.daily_sections[i].total_km,
+          area: route.daily_sections[i].area,
+          duration: route.daily_sections[i].duration,
+          difficulty: route.daily_sections[i].difficulty,
+          alert: route.daily_sections[i].alert,
+          accomm_array: accommArray,
+          chosen_accomm: "",
+          description: route.daily_sections[i].description,
+          sites: route.daily_sections[i].sites,
+          type: route.daily_sections[i].type
+        };
+      dailySectionsArr.push(dailySection);
+      }
+
+      //a route to add to 'my routes'
+      var myRoute = {
+          trip_id: id,
+          area: route.area,
+          trip_start_pt: route.trip_start_pt,
+          trip_end_pt: route.trip_end_pt,
+          start_date: route.start_date,
+          end_date: route.end_date,
+          days_num: route.days_num,
+          trip_km: route.trip_km,
+          day_km: route.day_km,
+          trip_difficulty: route.trip_difficulty,
+          trip_sites: route.trip_sites,
+          trip_type: route.trip_type,
+          trip_description: route.trip_description,
+          daily_sections: dailySectionsArr
+        };
+
+      var query = Traveler.findOneAndUpdate({email: mail}, {$push: {my_routes: myRoute}});
+      query.exec(function(err,route){
+        if(err) callback("routeNotAdded"); 
+        callback("routeAdded");
+      });
     });
 }
 
 // calculate trip end date and daily sections dates and update the trip dates 
 exports.updateTripDates = function(mail, tripId, sDate, daysNum, isFri, isSat, callback){	
+  //var sDate = new Date(sDate1);
+  console.log("first " + sDate);
   //calculate trip's end date
+  console.log(sDate.getDate());
   var eDate = new Date();
   eDate.setDate(sDate.getDate()+parseInt(daysNum-1));
   console.log("start date: " +sDate);
@@ -115,11 +121,12 @@ exports.updateTripDates = function(mail, tripId, sDate, daysNum, isFri, isSat, c
     tripDatesArr.push(new Date(tmpDate));
     tmpDate.setDate(tmpDate.getDate()+1);
   }
+  console.log("after dates array: " + sDate);
   
-  /*console.log("dates array: ");
+  console.log("dates array: ");
   for(var i = 0;  i<tripDatesArr.length; i++){
     console.log(tripDatesArr[i]);
-  }*/
+  }
 	
   //updating trip dates to traveler's trip
   var query = Traveler.findOne().where('email', mail).select('my_routes');
@@ -127,6 +134,7 @@ exports.updateTripDates = function(mail, tripId, sDate, daysNum, isFri, isSat, c
       if(err) callback("myRoutesNotFound");
       var myRoutes = routes.my_routes;
       var isRouteFound = false;
+      console.log("updating: " + tripDatesArr[0]);
       for(var i = 0; i<myRoutes.length; i++){
         if(myRoutes[i].trip_id == tripId){
           var isRouteFound = true;
@@ -134,15 +142,18 @@ exports.updateTripDates = function(mail, tripId, sDate, daysNum, isFri, isSat, c
           myRoutes[i].start_date = tripDatesArr[0];
           var dailySecs = myRoutes[i].daily_sections;
           for(var j = 0; j<dailySecs.length; j++){
+            console.log("daily "+ tripDatesArr[j]);
             dailySecs[j].date = tripDatesArr[j];
           }
+          var updatedRoute = myRoutes[i];
           break;
         }
       }
       if(isRouteFound == true){
         routes.set('my_routes', myRoutes);
         routes.save();
-      	callback("datesUpdated");
+      	//callback("datesUpdated");
+        callback(updatedRoute);
       }
       else callback("routeNotFound");	
     });
@@ -227,7 +238,75 @@ exports.getAllPreviousRoutes = function(mail, callback){
     });
 }
 
-exports.test = function(json, callback){
- //var myJson = JSON.parse(json);
-  console.log(json);
+// adding calculated suggested route to traveler
+exports.addRouteToSuggested = function(route, mail, callback){
+  var dailySectionsArr = []; //contains trip's daily section
+  for(var i = 0; i<route.daily_sections.length; i++){
+    var coordArray = []; //contains all of daily section's coords
+    var coordArr = route.daily_sections[i].coord_array;
+    for(var j = 0; j<coordArr.length; j++){
+      var coord ={}; //object representing a coord
+      coord.lat = coordArr[j].lat;
+      coord.lng = coordArr[j].lng;
+      coordArray.push(coord);
+    }
+
+    var accommArray = []; //contains all of daily section's accommodation places
+    var acoommArr = route.daily_sections[i].accomm_array; 
+    for(var j = 0; j<acoommArr.length; j++){
+      var accomm = {}; //object representing an accommodation place
+      accomm.accomm_name = acoommArr[j].accomm_name;
+      accomm.phone = acoommArr[j].phone;
+      accommArray.push(accomm);
+    }
+
+    //a trip's daily section
+    var dailySection = { 
+      day_num: route.daily_sections[i].day_num,
+      date: route.daily_sections[i].date,
+      start_pt: route.daily_sections[i].start_pt,
+      end_pt: route.daily_sections[i].end_pt,
+      start_coord: route.daily_sections[i].start_coord,
+      end_coord: route.daily_sections[i].end_coord,
+      coord_array: coordArray,
+      total_km: route.daily_sections[i].total_km,
+      area: route.daily_sections[i].area,
+      duration: route.daily_sections[i].duration,
+      difficulty: route.daily_sections[i].difficulty,
+      alert: route.daily_sections[i].alert,
+      accomm_array: accommArray,
+      chosen_accomm: "",
+      description: route.daily_sections[i].description,
+      sites: route.daily_sections[i].sites,
+      type: route.daily_sections[i].type
+    };
+  dailySectionsArr.push(dailySection);
+  }
+
+  //a route to add to 'suggested route'
+  var sugRoute = {
+      trip_id: "",
+      area: route.area,
+      trip_start_pt: route.trip_start_pt,
+      trip_end_pt: route.trip_end_pt,
+      start_date: route.start_date,
+      end_date: route.end_date,
+      days_num: route.days_num,
+      trip_km: route.trip_km,
+      day_km: route.day_km,
+      trip_difficulty: route.trip_difficulty,
+      trip_sites: route.trip_sites,
+      trip_type: route.trip_type,
+      trip_description: route.trip_description,
+      daily_sections: dailySectionsArr
+    };
+
+    console.log("suggested is: " + sugRoute);
+    
+    //setting suggested route to traveler's 'suggested route' field
+    var query = Traveler.findOneAndUpdate({email: mail}, {$set: {suggested_route: sugRoute}});
+    query.exec(function(err,traveler){
+      if(err) callback("routeNotAddedToSuggested");  
+      callback(route);
+    });
 }

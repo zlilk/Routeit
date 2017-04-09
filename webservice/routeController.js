@@ -683,9 +683,17 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
         else if(type == "ללא"){
             isTypeRight = true;
         }
-       
+        
         //if the chosen difficulty and type matches the trip difficulty and type
         if(isTypeRight == true && isDiffRight == true){
+            var tmpKmDay = "";
+            if(kmDay == 5){
+                tmpKmDay = 'עד 5';
+            } else if (kmDay == 10) {
+                tmpKmDay = '5-10';
+            } else {
+                tmpKmDay = '10-15';
+            }    
             currentRoute = {
                 "area": area,
                 "trip_start_pt": startPt,
@@ -694,7 +702,7 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
                 "end_date": "",
                 "days_num": totalDays,
                 "trip_km": totalKm,
-                "day_km": kmDay,
+                "day_km": tmpKmDay,
                 "trip_difficulty": totalDiff,
                 "trip_sites": totalSites,
                 "trip_type": totalType,
@@ -1345,6 +1353,14 @@ exports.calculateFullRoute = function(area, kmDay, dir, callback){
 
     function buildRoute(startPt, endPt, dailySectionsArr, totalKm, totalDays, totalSites, callback){
         var totalDescription = "שביל ישראל הוא הטרק של המדינה, שביל המזמין אתכם לחוות את הארץ דרך כל הגוף וכל החושים. מסע אלף הקילומטרים של שביל ישראל יוביל אתכם מדן ועד אילת, ובדרך תטעמו מכל טוב הארץ: מהירוק והמים של מקורות הירדן, הרי הגליל, הכנרת, הכרמל ומרכז הארץ, השקט של המדבר ועד הצבעים של הרי אילת וים סוף."
+        var tmpKmDay = "";
+        if(kmDay == 5){
+            tmpKmDay = 'עד 5';
+        } else if (kmDay == 10) {
+            tmpKmDay = '5-10';
+        } else {
+            tmpKmDay = '10-15';
+        }
         var currentRoute = {
             "area": area,
             "trip_start_pt": startPt,
@@ -1353,7 +1369,7 @@ exports.calculateFullRoute = function(area, kmDay, dir, callback){
             "end_date": "",
             "days_num": totalDays,
             "trip_km": totalKm,
-            "day_km": kmDay,
+            "day_km": tmpKmDay,
             "trip_difficulty": "",
             "trip_sites": totalSites,
             "trip_type": "",

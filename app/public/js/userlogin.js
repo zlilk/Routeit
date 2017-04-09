@@ -18,7 +18,10 @@ login.controller('UserController', ['$scope','$http', function($scope, $http){
         var url = "http://localhost:3000/createTraveler/" + email +"/" + name + "/" + image;
         $http.get(url).success(function(data){
             if(data == "userExists") {}
-            else localStorage.setItem("idCounter", 0);
+            else {
+                localStorage.setItem("idCounter", 0);
+                localStorage.setItem("currentRoute", null);
+            }
             window.location.assign("http://localhost:8080/userprofile.html");
         });
     }

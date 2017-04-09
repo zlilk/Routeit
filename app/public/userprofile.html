@@ -12,8 +12,8 @@
     </head>
     <body>
         <nav> 
-            <a id = "personalProfile" href="#"> personalProfile </a>
-            <a id = "dailyRoute" href="#"> dailyRoute </a>
+            <a id = "personalProfile" href="http://localhost:8080/userprofile.html"> personalProfile </a>
+            <a id = "dailyRoute" href="http://localhost:8080/dailyRoute.html"> dailyRoute </a>
             <a id = "detailedPlan" href="#"> detailedPlan </a> 
             <div class = "clear"> </div>
         </nav>
@@ -29,12 +29,8 @@
             <section id = "userRoutes"> 
                 <button id = "myRoutes" ng-click="showMyRoutes()"> המסלולים שלי </button>
                 <button id = "prevRoutes" ng-click="showRoutesHistory()"> הסטוריה </button>
-                <!-- <section id = "content" ng-bind-html="content1"> 
-                 <p ng-repeat> </p> 
-                </section> -->
             </section>
-            <section id = "content"> 
-                <!-- <p ng-repeat> </p> -->
+            <section id = "content">
             </section>
         </main>
         <footer> 
@@ -47,11 +43,11 @@
                 auth2.signOut().then(function () {
                     console.log('User signed out.');
                 });
-                window.location.assign("");
+                window.location.assign("http://localhost:8080/index.html");
             }
         </script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
         <script src="js/lib/angular/angular.min.js"></script>
-        <script src="js/userprofile.js"></script>
+        <script src="js/userprofile2.js"></script>
     </body>
  </html>
