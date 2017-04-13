@@ -85,9 +85,13 @@ app.get('/getRoute/:ml/:id', function(req,res){
 });
 
 app.get('/saveAccomm/:ml/:id/:ac/:dn', function(req,res){
-    var accomm = {accomm_name: "אכסניית צליל",
-    phone: "213434534"};
-    Traveler.saveAccommToDay(req.params.ml, req.params.id, accomm, req.params.dn, function(data){
+    var accommArr = (req.params.ac).split(",");
+    var accommObj = {
+      accomm_name: accommArr[0],
+      phone: accommArr[1]
+    };
+    console.log(accommObj);
+    Traveler.saveAccommToDay(req.params.ml, req.params.id, accommObj, req.params.dn, function(data){
       res.json(data); 
     });
 });

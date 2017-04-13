@@ -98,7 +98,8 @@ exports.addRouteToTraveler = function(id, mail, callback){
       var query = Traveler.findOneAndUpdate({email: mail}, {$push: {my_routes: myRoute}});
       query.exec(function(err,route){
         if(err) callback("routeNotAdded"); 
-        callback("routeAdded");
+        callback(myRoute);
+        //callback("routeAdded");
       });
     });
 }

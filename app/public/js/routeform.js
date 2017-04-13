@@ -31,14 +31,16 @@ routeForm.controller('FormController', ['$scope', '$rootScope', '$http',function
         unbindHandler();
     });
 
+    
     $scope.south = false; //flag that points weather the traveler chose south to north direction
 
     //function that orders the start points of the chosen area by the chosen direction
     $scope.dirValue = function(dir, area){
+        var tmpPointsArr = [];
         if(dir == 'north'){
             if($scope.south == false){}
             else {
-                startPts[area.area_id].points.reverse();
+                startPts[area.area_id].points.reverse();               
                 $scope.south = false;
             }
         }

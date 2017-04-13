@@ -15,22 +15,22 @@
     <body>
         <nav> 
             <a id = "personalProfile" href="http://localhost:8080/userprofile.html"> personalProfile </a>
-            <a id = "dailyRoute" href="#"> dailyRoute </a>
-            <a id = "detailedPlan" href="#"> detailedPlan </a> 
+            <a id = "dailyRoute" href="http://localhost:8080/dailyRoute.html"> dailyRoute </a>
+            <a id = "detailedPlan" href="http://localhost:8080/detailedPlan.html"> detailedPlan </a> 
             <div class = "clear"> </div>
         </nav>
         <main ng-controller = "FormController">
             <form id = "routeForm">
                 <label> איזור בארץ: </label>
-                <select name="area" ng-model="area" ng-change="checkArea(area.area)" ng-options="area.area for area in startPts">
+                <select name="area" id="area" ng-model="area" ng-change="checkArea(area.area)" ng-options="area.area for area in startPts">
                 </select><br>
                 <label> כיוון: </label>
-                <select name="dir" ng-model="dir" ng-change="dirValue(dir, area)">
+                <select name="dir" id="dir" ng-model="dir" ng-change="dirValue(dir, area)">
                     <option value="north">מצפון לדרום</option>
                     <option value="south">מדרום לצפון</option>
                 </select><br>
                 <label> נקודת פתיחה: </label>
-                <select class="disable" name="sPoint" ng-model="sPoint" ng-options="point.point_name for point in area.points">
+                <select class="disable" name="sPoint"  id="sPoint" ng-model="sPoint" ng-options="point.point_name for point in area.points">
                 </select><br>
                 <label> מספר ק"מ ליום: </label>
                 <select name="km" ng-model="km">

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html ng-app="detailedPlan">
+    <head>
+        <meta charset="utf-8">
+        <meta name="google-signin-client_id" content="296256466166-pdh58rh53nihcc5tfh184vmautajqsup.apps.googleusercontent.com">
+        <title>Detailed Plan</title>
+        <link href='https://fonts.googleapis.com/css?family=Alef' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/style.css">
+        <script src="https://apis.google.com/js/platform.js" async defer></script> 
+        <style>
+            #map {
+                height: 200px;
+                width: 500px;
+            }
+        </style>  
+    </head>
+    <body ng-controller = "planController">
+        <nav> 
+            <a id = "personalProfile" href="http://localhost:8080/userprofile.html"> personalProfile </a>
+            <a id = "dailyRoute" href="http://localhost:8080/dailyRoute.html"> dailyRoute </a>
+            <a id = "detailedPlan" href="http://localhost:8080/detailedPlan.html"> detailedPlan </a>
+            <div class = "clear"> </div>
+        </nav>
+        <header id="planHeader"> 
+            <h1> {{start}} - {{end}} </h1>
+            <h1>{{date}} </h1>
+        </header>
+        <main id="planMain">
+            <section id="tripMap">
+                <div id="map"></div>
+            </section>
+            <section class = "tripDay" ng-repeat = "d in dailySections">
+                <p class = "dayDate">
+                    {{d.dayNum}} <br>
+                    {{d.dayDate}} <br>
+                    {{d.weekDay}} <br>
+                </p>
+                <p class = "dayDetails">
+                    <img src="#"> {{d.startPt}} - {{d.endPt}} <br>
+                    <img src="#"> {{d.km}} <br>
+                    <img src="#"> {{d.duration}} <br>
+                    <img src="#"> {{d.diff}} <br>
+                    <img src="#">  
+                    <select class="sleepPlaces" ng-model="d[d.model]"> 
+                        <option ng-repeat = "a in d.accommArr"> {{a}} </option> 
+                    </select> 
+                    <button ng-click="saveAccomm(d[d.model], d.dayNum)"> + </button>
+                   <br> 
+                </p>
+            </section>
+             <span id = "hi"> </span> 
+        </main>
+        <footer> 
+            <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
+            <div class = "clear"> </div>
+        </footer>
+        <script>
+            function initMap() {
+                    var currentRoute = JSON.parse(localStorage.getItem("currentRoute"));
+                    var tripCoordsArr = []; // all daily sections coords
+                    var tmpCoordsArr = []; // holds coords temporarily 
+                    var dailyCoordsArray = []; // holds one daily section's coords
+                    for(var i=0; i<currentRoute.daily_sections.length; i++){
+                        for(var j=0; j<currentRoute.daily_sections[i].coord_array.length; j++){
+                            var dailyCoord = {
+                                lat: Number(currentRoute.daily_sections[i].coord_array[j].lat),
+                                lng: Number(currentRoute.daily_sections[i].coord_array[j].lng)
+                            }
+                            dailyCoordsArray.push(dailyCoord);
+                        }
+                        tripCoordsArr = tmpCoordsArr.concat(dailyCoordsArray);
+                        dailyCoordsArray = [];
+                        tmpCoordsArr = tripCoordsArr;
+                    }
+                    var centerCoord = tripCoordsArr[parseInt(tripCoordsArr.length/2)];
+                    var map = new google.maps.Map(document.getElementById('map'), {
+                      zoom: 12,
+                      center: centerCoord, //{lat: 33.240884, lng: 35.575751},
+                      mapTypeId: 'terrain'
+                    });
+                    var flightPath = new google.maps.Polyline({
+                      path: tripCoordsArr,
+                      geodesic: true,
+                      strokeColor: '#FF0000',
+                      strokeOpacity: 1.0,
+                      strokeWeight: 2
+                    });
+                    flightPath.setMap(map);
+            }
+            function signOut() {
+                var auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                    console.log('User signed out.');
+                });
+                window.location.assign("");
+            }
+        </script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&callback=initMap">
+        </script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+        <script src="js/lib/angular/angular.min.js"></script>
+        <script src="js/detailedplan.js"></script>
+    </body>
+ </html>

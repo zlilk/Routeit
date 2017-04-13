@@ -4,17 +4,19 @@ dailyRoute.controller('dailyController', ['$scope', '$http',function($scope, $ht
     var currentRoute = JSON.parse(localStorage.getItem("currentRoute")); //getting the current route
     var currentDate = new Date(); //today's trip
     $scope.currentDate = currentDate.getDate() + "/" + (currentDate.getMonth()+1) + "/" + currentDate.getFullYear();
+    var mainElement = angular.element(document.querySelector('#dailyMain'));
     //if the route has no dates or there isn't any routes
     if(currentRoute==null || currentRoute.start_date == null){
-        var mainElement = angular.element(document.querySelector('#dailyMain'));
         mainElement.html('<p>לא קיים יום טיול עבור תאריך זה</p>');
     //if the route has dates
-    } else{
+    }else {
         //serching the current day
+        var foundDay = false; //flag to check if the trip days have the current date
         for(var i = 0; i< currentRoute.daily_sections.length; i++){
             var tmpDate = new Date(currentRoute.daily_sections[i].date);
             if((currentDate.getDate() == tmpDate.getDate()) && (currentDate.getMonth() == tmpDate.getMonth()) 
                 && (currentDate.getFullYear() == tmpDate.getFullYear())){
+                foundDay = true;
                 $scope.start = currentRoute.daily_sections[i].start_pt;
                 $scope.end = currentRoute.daily_sections[i].end_pt;
                 $scope.duration = currentRoute.daily_sections[i].duration;
@@ -44,6 +46,9 @@ dailyRoute.controller('dailyController', ['$scope', '$http',function($scope, $ht
                 $scope.sitesArr = sitesArr;
                 $scope.alertsArr = alertsArr;
             }
+        }
+        if(foundDay == false){
+            mainElement.html('<p>לא קיים יום טיול עבור תאריך זה</p>');
         }
     }
 }]);
