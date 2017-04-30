@@ -81,6 +81,8 @@ exports.addRouteToTraveler = function(id, mail, callback){
       var myRoute = {
           trip_id: id,
           area: route.area,
+          direction: route.direction,
+          creation_date: new Date(),
           trip_start_pt: route.trip_start_pt,
           trip_end_pt: route.trip_end_pt,
           start_date: route.start_date,
@@ -110,8 +112,8 @@ exports.updateTripDates = function(mail, tripId, sDate, daysNum, isFri, isSat, c
   console.log("first " + sDate);
   //calculate trip's end date
   console.log(sDate.getDate());
-  var eDate = new Date();
-  eDate.setDate(sDate.getDate()+parseInt(daysNum-1));
+  var eDate = new Date(sDate);
+  eDate.setDate(eDate.getDate()+parseInt(daysNum-1));
   console.log("start date: " +sDate);
   console.log("end date: "+eDate +"\n");
 
@@ -160,15 +162,6 @@ exports.updateTripDates = function(mail, tripId, sDate, daysNum, isFri, isSat, c
     });
 }
 
-// update a certain trip id to be the current trip id  
-exports.updateCurrentRoute = function(mail, tripId, callback){
-  var query = Traveler.findOneAndUpdate({email: mail}, {$set: {current_route_id: tripId}});
-    query.exec(function(err,traveler){
-      if(err) callback("currentNotupdated");
-      callback("currentUpdated");
-    });
-}
-
 // delete a certain trip by trip id
 exports.deleteRouteFromTraveler = function(mail, tripId, callback){
    var query = Traveler.findOneAndUpdate({email: mail}, {$pull: {my_routes: {trip_id: tripId}}});
@@ -179,7 +172,7 @@ exports.deleteRouteFromTraveler = function(mail, tripId, callback){
 }
 
 // get the current route details
-exports.getCurrentRoute = function(mail, tripId, callback){
+/*exports.getCurrentRoute = function(mail, tripId, callback){
   var query = Traveler.findOne().where('email', mail).select('my_routes');
   query.exec(function(err,routes){
       var myRoutes = routes.my_routes;
@@ -193,7 +186,7 @@ exports.getCurrentRoute = function(mail, tripId, callback){
       if(tmpIndx == -1) callback("routeNotFound");
       else callback(myRoutes[tmpIndx]); 
     });
-} 
+} */
 
 // update the chosen accommodation for a daily section in current route 
 exports.saveAccommToDay = function(mail, tripId, accomm, dayNum, callback){
@@ -237,6 +230,59 @@ exports.getAllPreviousRoutes = function(mail, callback){
       if(err) callback("prevRoutesNotFound");
       callback(routes);
     });
+}
+
+exports.addPrevToTraveler = function(mail, callback){
+  //a route to add to 'my routes'
+  /*var prevRoute = {
+    trip_id: 1000,
+    area: "ירושלים",
+    direction: "north",
+    creation_date: new Date(2017,3,15),
+    trip_start_pt: "יער בן שמן",
+    trip_end_pt: "לטרון",
+    start_date: new Date(2017,3,26),
+    end_date: new Date(2017,3,27),
+    days_num: 2,
+    trip_km: 10,
+    day_km: "עד 5",
+    trip_difficulty: "המסלול ברובו ברמת קושי בינונית",
+    trip_sites: ["מבצר לטרון"],
+    trip_type: ["מתאים למשפחות"],
+    trip_description: ["מסלול ירוק", "נוף מרהיב", "מתאים לכל עונות השנה"],
+  };*/
+
+  var prevRoute = {
+    trip_id: 1001,
+    area: "המכתשים",
+    direction: "north",
+    creation_date: new Date(2017,1,20),
+    trip_start_pt: "מצד תמר",
+    trip_end_pt: "מצד צפיר",
+    start_date: new Date(2017,2,2),
+    end_date: new Date(2017,2,4),
+    days_num: 3,
+    trip_km: 22,
+    day_km: "5-10",
+    trip_difficulty: "המסלול ברובו ברמת קושי קשה",
+    trip_sites: ["המכתש הקטן"],
+    trip_type: ["מאתגר"],
+    trip_description: ["מכיל עליות", "נוף מרהיב", "מתאים לכל עונות השנה"],
+  };
+    
+  var query = Traveler.findOneAndUpdate({email: mail}, {$push: {previous_routes: prevRoute}});
+  query.exec(function(err,route){
+    if(err) callback("routeNotAdded"); 
+    callback("prevRouteAdded");
+  }); 
+}
+
+exports.deletePrevFromTraveler = function(mail, tripId, callback){
+  var query = Traveler.findOneAndUpdate({email: mail}, {$pull: {previous_routes: {trip_id: tripId}}});
+  query.exec(function(err,traveler){
+    if(err) callback("routeNotDeleted");
+    callback("routeDeleted");
+  });
 }
 
 // adding calculated suggested route to traveler
@@ -288,6 +334,8 @@ exports.addRouteToSuggested = function(route, mail, callback){
   var sugRoute = {
       trip_id: "",
       area: route.area,
+      direction: route.direction,
+      creation_date: "",
       trip_start_pt: route.trip_start_pt,
       trip_end_pt: route.trip_end_pt,
       start_date: route.start_date,

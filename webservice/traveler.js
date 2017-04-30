@@ -39,6 +39,8 @@ var daily_section = new schema({
 var route = new schema({
     trip_id: Number,
     area: String,
+    direction: String,
+    creation_date: Date,
     trip_start_pt: String,
     trip_end_pt: String,
     start_date: Date,
@@ -53,13 +55,30 @@ var route = new schema({
     daily_sections: [daily_section]
 });
 
+var prevRoute = new schema({
+    trip_id: Number,
+    area: String,
+    direction: String,
+    creation_date: Date,
+    trip_start_pt: String,
+    trip_end_pt: String,
+    start_date: Date,
+    end_date: Date,
+    days_num: Number,
+    trip_km: Number,
+    day_km: String,
+    trip_difficulty: String,
+    trip_sites: [String],
+    trip_type: [String],
+    trip_description: [String]
+});
+
 var travelerSchema = new schema({
     full_name: String,
     image: String,
     email: {type:String, index:1, required:true, unique:true},
     suggested_route: route,
-    current_route_id: Number,
-    previous_routes: [route],
+    previous_routes: [prevRoute],
     my_routes: [route]
 }, {collection: 'travelers'});
 

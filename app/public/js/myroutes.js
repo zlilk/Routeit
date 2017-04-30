@@ -1,0 +1,186 @@
+var userRoutes = angular.module('userRoutes', []);
+
+var myRoutes = {}; //contains traveler's 'my routes' html
+var myRoutesArr = {}; //contains traveler's 'my routes' array localy
+var dailyRoutesArr = {};
+
+userRoutes.controller('RoutesController', ['$scope', '$http', '$compile', function($scope, $http, $compile){
+    var userMail = localStorage.getItem("email");
+    var routesContent = angular.element(document.querySelector('#content')); 
+    $scope.name  = localStorage.getItem("name");
+    $scope.img = localStorage.getItem("pic");
+
+    //set the traveler's chosen route
+    $scope.chosenRoute = function(tripId){
+        myRoutesArr = JSON.parse(localStorage.getItem("myRoutes"));
+        var currentRoute = JSON.parse(localStorage.getItem("currentRoute"));
+        
+        //if chosen cuurentRoute equal to previous chosen currentRoute
+        if(currentRoute.trip_id == tripId){
+            console.log("the same chosen route");
+            var chosenRouteElement = angular.element(document.querySelector('#route'+tripId));
+            chosenRouteElement.css('background','yellow');
+            for(var i = 0; i<myRoutesArr.length; i++){
+                if(myRoutesArr[i].trip_id == tripId){
+                    console.log("found the chosen route: " + tripId);
+                    localStorage.setItem("currentRoute", JSON.stringify(myRoutesArr[i]));
+                    break;
+                }
+            }
+        }
+        //if chosen currentRoute is different fron previous chosen currentRoute
+        else {
+            console.log("different route chosen! old route: " + currentRoute.trip_id);
+            var oldChosenRouteElement = angular.element(document.querySelector('#route'+currentRoute.trip_id));
+            oldChosenRouteElement.css('background','white'); 
+            var chosenRouteElement = angular.element(document.querySelector('#route'+tripId));
+            chosenRouteElement.css('background','yellow');
+            for(var i = 0; i<myRoutesArr.length; i++){
+                if(myRoutesArr[i].trip_id == tripId){
+                    console.log("found the chosen route: " + tripId);
+                    localStorage.setItem("currentRoute", JSON.stringify(myRoutesArr[i]));
+                    break;
+                }
+            }
+        }
+        var updatedCurrentRoute = JSON.parse(localStorage.getItem("currentRoute"));
+        console.log("chosen tripId: " + updatedCurrentRoute.trip_id + "\n\n");
+    }
+
+    //function that shows traveler's 'my routes'
+    $scope.showMyRoutes = function(){
+        var allMyRoutes = [];
+        myRoutesArr = JSON.parse(localStorage.getItem("myRoutes"));
+        console.log(myRoutesArr);
+        //set current route to null if there are no routes in 'my routes'
+        if(myRoutesArr == null || myRoutesArr == "[]") {
+            console.log("my routes is empty!");
+            localStorage.setItem("currentRoute", null);
+        }
+
+        else{
+            //building my routes html
+            for(var i = 0; i<myRoutesArr.length; i++){
+                var route = '<section class = "route" ng-click="chosenRoute(' + myRoutesArr[i].trip_id + ')" id="route' + myRoutesArr[i].trip_id +'"><h3>' + myRoutesArr[i].trip_start_pt + ' - ' + myRoutesArr[i].trip_end_pt +
+                '</h3>';
+                if(myRoutesArr[i].direction == "north") route+= '<p> צפון -> דרום </p>';
+                else route+= '<p> דרום -> צפון </p>';
+                if(myRoutesArr[i].start_date){
+                    var sDate = new Date(myRoutesArr[i].start_date);
+                    var sDateString = sDate.getDate() + '/' + (sDate.getMonth()+1) + '/' + sDate.getFullYear(); 
+                    var eDate = new Date(myRoutesArr[i].end_date);
+                    var eDateString = eDate.getDate() + '/' + (eDate.getMonth()+1) + '/' + eDate.getFullYear(); 
+                    console.log(myRoutesArr[i].start_date + " " + myRoutesArr[i].end_date); 
+                    if(sDateString == eDateString){
+                        console.log("start and end dates are equal!");
+                        route += '<p>' + sDateString + '</p>';
+                    } else {
+                        route += '<p>' + eDateString + " - " + sDateString+'</p>';   
+                    }
+                }
+                route += '<p> אזור ' + myRoutesArr[i].area; 
+                if(myRoutesArr[i].days_num == 1) {
+                    route += '<br> טיול יומי';
+                }
+                else {
+                    route += '<br> מספר ימים: ' + myRoutesArr[i].days_num;
+                }
+                route += '<br> מספר ק"מ ליום: ' + myRoutesArr[i].day_km + '<br> מספר ק"מ כולל: ' + myRoutesArr[i].trip_km + '</p>' +
+                '<input type="date" ng-model = "date'+i+'" class = "date"> <button class = "dateBtn" ng-click="updateDate(' + myRoutesArr[i].trip_id + ',date' + i + ',' + myRoutesArr[i].days_num + ')"> עדכן תאריך </button><br>'+
+                '<button class = "editBtn"> ערוך מסלול </button> <button class = "deleteBtn" ng-click="deleteRoute(' + myRoutesArr[i].trip_id + ')"> מחק מסלול </button> <button class = "shareBtn"> שתף מסלול </button><br>' +
+                '<button class="detailedBtn" ng-click="showDetailedPlan()"> לתכנית הטיול </button><br>';
+                var cDate = new Date(myRoutesArr[i].creation_date);
+                var cDateString = cDate.getDate() + '/' + (cDate.getMonth()+1) + '/' + cDate.getFullYear(); 
+                route+='<p> נוצר ב- '+ cDateString +'</p></section>';
+                allMyRoutes+=route;
+            }
+            myRoutes = allMyRoutes;
+            var routesContent = angular.element(document.querySelector('#content'));
+            var linkingFunction = $compile(myRoutes);
+            var elem = linkingFunction($scope);
+            routesContent.html(elem);
+
+            //show the current route if there is one
+            var currentRoute = JSON.parse(localStorage.getItem("currentRoute"));
+            console.log("current route is: "+ currentRoute);
+            if(currentRoute!=null){
+                console.log("calling chosenRoute with current tripId: " + currentRoute.trip_id);
+                $scope.chosenRoute(currentRoute.trip_id);
+            }
+        }
+    }
+    $scope.showMyRoutes();
+
+    //function that deletes a chosen route from traveler's routes
+    $scope.deleteRoute = function(tripId){
+        myRoutesArr = JSON.parse(localStorage.getItem("myRoutes"));
+        dailyRoutesArr = JSON.parse(localStorage.getItem("dailyRoutes"));
+        $http.get("http://localhost:3000/deleteRoute/" + userMail + "/" + tripId).success(function(routes){
+            //delete the route from myRoutesArr
+            for(var i = 0; i<myRoutesArr.length; i++){
+                if(myRoutesArr[i].trip_id == tripId){
+                    console.log("found the route tripId to delete: " + tripId + ", in array position: " + i);
+                    myRoutesArr.splice(i,1);
+                    localStorage.setItem("myRoutes", JSON.stringify(myRoutesArr));
+                    break;
+                }
+            }
+            for(var i = 0; i<dailyRoutesArr.length; i++){
+                if(dailyRoutesArr[i].trip_id == tripId){
+                    console.log("found the route tripId to delete: " + tripId + ", in array position: " + i);
+                    dailyRoutesArr.splice(i,1);
+                    localStorage.setItem("dailyRoutes", JSON.stringify(dailyRoutesArr));
+                    break;
+                }
+            }
+            console.log("deleted");
+            console.log(JSON.parse(localStorage.getItem("myRoutes")));
+            //if the route to delete is the current route
+            var currentRoute = JSON.parse(localStorage.getItem("currentRoute"));
+            if(currentRoute!=null){
+                if(currentRoute.trip_id == tripId){
+                    if(myRoutesArr.length != 0){
+                        localStorage.setItem("currentRoute", JSON.stringify(myRoutesArr[0]));   
+                    } else localStorage.setItem("currentRoute", null);
+                }
+            }
+            $scope.showMyRoutes();          
+        });
+    }
+
+    //function that updates a certain trip dates
+    $scope.updateDate = function(tripId, date, daysNum){
+        myRoutesArr = JSON.parse(localStorage.getItem("myRoutes"));
+        dailyRoutesArr = JSON.parse(localStorage.getItem("dailyRoutes"));
+        //update the dates in database and in local variable myRoutesArr
+        if(date == null) {}
+        else {
+            $http.get("http://localhost:3000/updateDates/" + userMail + "/" + tripId + "/" + date + "/" + daysNum + "/no/no").success(function(route){
+                var updatedTripId;
+                for(var i = 0; i<myRoutesArr.length; i++){
+                    if(myRoutesArr[i].trip_id == tripId){
+                        console.log("found the updated route!");
+                        updatedTripId = i;
+                        myRoutesArr[i] = route;
+                        localStorage.setItem("myRoutes", JSON.stringify(myRoutesArr));
+                        break;
+                    }
+                }
+                for(var i = 0; i<dailyRoutesArr.length; i++){
+                    if(dailyRoutesArr[i].trip_id == tripId){
+                        console.log("found the updated route!");
+                        dailyRoutesArr.splice(i,1);
+                        localStorage.setItem("dailyRoutes", JSON.stringify(dailyRoutesArr));
+                        break;
+                    }
+                }
+                $scope.showMyRoutes();          
+            });
+        }
+    }
+
+    $scope.showDetailedPlan = function(){
+        localStorage.setItem("planFlag", "current");
+        window.location.assign("http://localhost:8080/detailedplan.html");
+    }
+}]);

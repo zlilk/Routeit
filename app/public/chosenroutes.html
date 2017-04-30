@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html ng-app="detailedPlan">
+<html ng-app="chosenRoutes">
     <head>
         <meta charset="utf-8">
         <meta name="google-signin-client_id" content="296256466166-pdh58rh53nihcc5tfh184vmautajqsup.apps.googleusercontent.com">
-        <title>Detailed Plan</title>
+        <title>My Daily Routes</title>
         <link href='https://fonts.googleapis.com/css?family=Alef' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="css/style.css">
-        <script src="https://apis.google.com/js/platform.js" async defer></script> 
+        <script src="https://apis.google.com/js/platform.js" async defer></script>   
     </head>
-    <body ng-controller = "planController">
+    <body>
         <header> 
             <button class="hamburger">&#9776;</button>
             <a href="http://localhost:8080/dailyroute1.html"><h1 class = "appLogo"> Routeit </h1></a>
         </header>
-        <main id="planMain">
+        <main ng-controller = "chosenRoutesController">
             <nav class="menu">
               <ul>
                 <a href="http://localhost:8080/userprofile.html"><li><img class = "userPic" src={{img}}><br>
@@ -27,43 +27,18 @@
                 <a href="http://localhost:8080/dailyroute1.html"><li> יום הטיול </li></a>
               </ul>
             </nav>
-            <button ng-click="goBack()"> < </button> 
-            <h1> {{start}} - {{end}} </h1>
-            <h1>{{date}} </h1>
-            <section id="tripMap">
-                <div id="map"></div>
+            <a href="http://localhost:8080/dailyroute1.html"> < </a>
+            <h3 id = "myRoutes"> המסלולים היומיים שלי </h3>
+            <section id = "content">
             </section>
-            <section class = "tripDay" ng-repeat = "d in dailySections">
-                <p class = "dayDate">
-                    {{d.dayNum}} <br>
-                    {{d.dayDate}} <br>
-                    {{d.weekDay}} <br>
-                </p>
-                <p class = "dayDetails">
-                    <img src="#"> {{d.startPt}} - {{d.endPt}} <br>
-                    <img src="#"> {{d.km}} <br>
-                    <img src="#"> {{d.duration}} <br>
-                    <img src="#"> {{d.diff}} <br>
-                    <img src="#">  
-                    <select class="sleepPlaces" ng-model="d[d.model]"> 
-                        <option ng-repeat = "a in d.accommArr"> {{a}} </option> 
-                    </select> 
-                    <button ng-click="saveAccomm(d[d.model], d.dayNum)"> + </button>
-                   <br> 
-                </p>
-            </section>
-             <span id = "hi"> </span> 
         </main>
         <footer> 
             <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
             <div class = "clear"> </div>
         </footer>
-        <script src="js/detailedMap.js"></script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&language=iw&callback=initMap">
-        </script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
         <script src="js/lib/angular/angular.min.js"></script>
         <script src="js/menu.js"></script>
-        <script src="js/detailedplan.js"></script>
+        <script src="js/chosenroutes.js"></script>
     </body>
  </html>

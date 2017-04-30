@@ -21,6 +21,10 @@ login.controller('UserController', ['$scope','$http', function($scope, $http){
             else {
                 localStorage.setItem("idCounter", 0);
                 localStorage.setItem("currentRoute", null);
+                localStorage.setItem("chosenRoute", null);
+                localStorage.setItem("myRoutes", null);
+                localStorage.setItem("dailyRoutes", null);
+                localStorage.setItem("currentDailyRoute", null);
             }
             window.location.assign("http://localhost:8080/userprofile.html");
         });

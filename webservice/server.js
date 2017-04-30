@@ -57,12 +57,6 @@ app.get('/addRoute/:id/:ml', function(req,res){
     });
 });
 
-app.get('/updateCurrent/:ml/:id', function(req,res){
-    Traveler.updateCurrentRoute(req.params.ml, req.params.id, function(data){
-      res.json(data); 
-    });
-}); 
-
 app.get('/updateDates/:ml/:id/:sd/:dn/:fr/:st', function(req,res){
     console.log("before sending: " + req.params.sd);
     var date =  new Date(req.params.sd);
@@ -78,11 +72,11 @@ app.get('/deleteRoute/:ml/:id', function(req,res){
     });
 }); 
 
-app.get('/getRoute/:ml/:id', function(req,res){
+/*app.get('/getRoute/:ml/:id', function(req,res){
     Traveler.getCurrentRoute(req.params.ml, req.params.id, function(data){
       res.json(data); 
     });
-});
+});*/
 
 app.get('/saveAccomm/:ml/:id/:ac/:dn', function(req,res){
     var accommArr = (req.params.ac).split(",");
@@ -104,6 +98,18 @@ app.get('/getMyRoutes/:ml', function(req,res){
 
 app.get('/getPrevRoutes/:ml', function(req,res){
     Traveler.getAllPreviousRoutes(req.params.ml, function(data){
+      res.json(data); 
+    });
+});
+
+app.get('/addPrevRoute/:ml', function(req,res){
+    Traveler.addPrevToTraveler(req.params.ml, function(data){
+      res.json(data); 
+    });
+});
+
+app.get('/deletePrevRoute/:ml/:id', function(req,res){
+    Traveler.deletePrevFromTraveler(req.params.ml, req.params.id, function(data){
       res.json(data); 
     });
 });

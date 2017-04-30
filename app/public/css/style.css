@@ -8,3 +8,163 @@
   opacity: 0;
   transition: visibility 0s 2s, opacity 2s linear;
 }
+
+@media screen and (max-width: 480px){
+	body {
+		direction: rtl;
+	}
+
+	header {
+		width:100%; 
+		background:#ffffff; 
+		height:60px; 
+		line-height:60px;
+		border-bottom:1px solid #dddddd;
+		padding-bottom: 15%;
+	}
+
+	main {
+		position: relative;
+		padding-top: 3%;
+	}
+
+	.appLogo {
+		text-align: center;
+	}
+
+	.backgroundMap {
+	    height:100vh; 
+	    width:100%;
+	}
+
+	.miniMap {
+	    height: 200px;
+	    width: 100%;
+	}
+
+	#dailyStartEnd {
+		text-align: center;
+		margin-top: 2%;
+	}
+
+	#dailyDayDate {
+		text-align: center;
+		margin-bottom: 0px;
+	}
+
+	#dailyDetails{
+		margin-right: 2%;
+	}
+
+	.userPic {
+		border-radius: 150px;
+	}
+
+	#dailyDayDate {
+		margin-top: 0px;
+	}
+
+	.hamburger{
+	  background:none;
+	  position:absolute;
+	  top:0;
+	  right:0;
+	  line-height:45px;
+	  padding:5px 15px 0px 15px;
+	  color:#999;
+	  border:0;
+	  font-size:2.3em;
+	  font-weight:bold;
+	  cursor:pointer;
+	  outline:none;
+	  z-index:10000000000000;
+	}
+
+	.menu{z-index:1000000; font-weight:bold; font-size:0.8em; width:100%; height: 100vh; background:#f1f1f1; position:absolute; text-align:center; font-size:12px; width: 50%; right: 0px; top: 0px;}
+	.menu ul {margin: 0; padding: 0; list-style-type: none; list-style-image: none;}
+	.menu li {display: block;   padding:15px 0 15px 0; border-bottom:#dddddd 1px solid;}
+	.menu li:hover{display: block;    background:#ffffff; padding:15px 0 15px 0; border-bottom:#dddddd 1px solid;}
+	.menu ul li a { text-decoration:none;  margin: 0px; color:#666;}
+	.menu ul li a:hover {  color: #666; text-decoration:none;}
+	.menu a{text-decoration:none; color:#666;}
+	.menu a:hover{text-decoration:none; color:#666;}
+
+	.glyphicon-home{
+	  color:white; 
+	  font-size:1.5em; 
+	  margin-top:5px; 
+	  margin:0 auto;
+	}
+
+	header{display:inline-block; font-size:12px;}
+	span{padding-left:20px;}
+	a{color:#336699;}
+
+	#userProfile {
+		text-align: center;
+	}
+
+	#popup {
+		position: relative;
+	}
+
+	#x {
+		position: absolute;
+		z-index: 1;
+		top: 0px;
+		right: 0px;
+		padding: 5px;
+		font-size: 12px;
+	}
+
+	/* The actual popup */
+	.popuptext {
+	    visibility: hidden;
+	    width: 300px;
+	    height: 80px;
+	    background-color: #555;
+	    color: #fff;
+	    text-align: center;
+	    border-radius: 6px;
+	    padding: 20px;
+	    position: absolute;
+	    z-index: 1;
+	    top: 6%;
+	    left: 35%;
+	    margin-left: -80px;
+	}
+
+	/* Popup arrow */
+	.popuptext::after {
+	    content: "";
+	    position: absolute;
+	    top: 100%;
+	    left: 50%;
+	    margin-left: -5px;
+	    border-width: 5px;
+	    border-style: solid;
+	    border-color: #555 transparent transparent transparent;
+	}
+
+	.popuptext button {
+		color: #000000;
+	}
+
+	/* Toggle this class - hide and show the popup */
+	.show {
+	    visibility: visible;
+	    -webkit-animation: fadeIn 1s;
+	    animation: fadeIn 1s;
+	}
+
+	/* Add animation (fade in the popup) */
+	@-webkit-keyframes fadeIn {
+	    from {opacity: 0;} 
+	    to {opacity: 1;}
+	}
+
+	@keyframes fadeIn {
+	    from {opacity: 0;}
+	    to {opacity:1 ;}
+	}
+}

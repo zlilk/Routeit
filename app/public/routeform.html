@@ -10,17 +10,28 @@
         <link rel="stylesheet" href="css/style.css">
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
         <script src="https://apis.google.com/js/platform.js" async defer></script>
-        <style> body{ direction: rtl; } </style>
     </head>
     <body>
-        <nav> 
-            <a id = "personalProfile" href="http://localhost:8080/userprofile.html"> personalProfile </a>
-            <a id = "dailyRoute" href="http://localhost:8080/dailyRoute.html"> dailyRoute </a>
-            <a id = "detailedPlan" href="http://localhost:8080/detailedPlan.html"> detailedPlan </a> 
-            <div class = "clear"> </div>
-        </nav>
+        <header> 
+            <button class="hamburger">&#9776;</button>
+             <a href="http://localhost:8080/dailyroute1.html"><h1 class = "appLogo"> Routeit </h1></a>
+        </header>
         <main ng-controller = "FormController">
+            <nav class="menu">
+              <ul>
+                <a href="http://localhost:8080/userprofile.html"><li><img class = "userPic" src={{img}}><br>
+                    <h4 id = "userName"><b> {{name}} </b></h4>     
+                </li></a>
+                <a href="http://localhost:8080/myroutes.html"><li> המסלולים שלי </li></a>
+                <a href="http://localhost:8080/routeshistory.html"><li> הסטוריית מסלולים </li></a>
+                <a href="http://localhost:8080/routeform.html"><li> תכנון מסלול חדש </li></a>
+                <a href="http://localhost:8080/dailyroute1.html"><li> יום הטיול </li></a>
+              </ul>
+            </nav> 
             <form id = "routeForm">
+                <div id = #popup>
+                    <span class="popuptext" id="myPopup"><span id="x" ng-click="closePopup()">&#10005;</span></span>
+                </div>
                 <label> איזור בארץ: </label>
                 <select name="area" id="area" ng-model="area" ng-change="checkArea(area.area)" ng-options="area.area for area in startPts">
                 </select><br>
@@ -46,10 +57,11 @@
                     <option value="בינוני"> בינוני </option>
                     <option value="קשה"> קשה </option>
                 </select><br>
-                <label>  אופי הטיול: </label>
+                <label>  מאפייני הטיול: </label>
                 <select name="type" ng-model="type" class="disable">
-                    <option value="ללא"> ללא </option>
+                    <option value="ללא"> ללא העדפה </option>
                     <option value="מתאים למשפחות"> מתאים למשפחות </option>
+                    <option value="מתאים לבעלי מוגבלויות"> מתאים לבעלי מוגבלויות </option>
                     <option value="מאתגר"> מאתגר </option>
                     <option value="מיטיבי לכת"> למיטיבי לכת </option>
                 </select><br>
@@ -60,16 +72,8 @@
             <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
             <div class = "clear"> </div>
         </footer>
-        <script>
-            function signOut() {
-                var auth2 = gapi.auth2.getAuthInstance();
-                auth2.signOut().then(function () {
-                    console.log('User signed out.');
-                });
-                window.location.assign("");
-            }
-        </script>
         <script src="js/lib/angular/angular.min.js"></script>
+        <script src="js/menu.js"></script>
         <script src="js/routeform.js"></script>
     </body>
  </html>

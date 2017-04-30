@@ -696,6 +696,7 @@ exports.calculateRoute = function(area, kmDay, dir, totalDays, startPt, diff, ty
             }    
             currentRoute = {
                 "area": area,
+                "direction": dir,
                 "trip_start_pt": startPt,
                 "trip_end_pt": endPt,
                 "start_date": "",
@@ -1363,6 +1364,7 @@ exports.calculateFullRoute = function(area, kmDay, dir, callback){
         }
         var currentRoute = {
             "area": area,
+            "direction": dir,
             "trip_start_pt": startPt,
             "trip_end_pt": endPt,
             "start_date": "",

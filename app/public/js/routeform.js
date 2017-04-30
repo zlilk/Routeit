@@ -23,6 +23,8 @@ routeForm.run(function($rootScope, $http) {
 
 routeForm.controller('FormController', ['$scope', '$rootScope', '$http',function($rootScope, $scope, $http){
     function init() {
+        $scope.name =  localStorage.getItem("name");
+        $scope.img = localStorage.getItem("pic");
         $scope.startPts = startPts; //an array contains all of the areas and their start points options
     }
 
@@ -69,8 +71,27 @@ routeForm.controller('FormController', ['$scope', '$rootScope', '$http',function
         $http.get("http://localhost:3000/calculate/" + area+ "/" + km + "/" + dir + "/" + daysNum + "/" + sPoint + "/" + diff + "/" + type + "/" + email).success(function(route){
             var routeStr = JSON.stringify(route);
             localStorage.setItem("suggestedRoute", routeStr);
-            console.log(localStorage.getItem("suggestedRoute"));
-            window.location.assign("http://localhost:8080/suggested.html");
+            var sugRoute = JSON.parse(localStorage.getItem("suggestedRoute"));
+            var popupElement = angular.element(document.querySelector('#myPopup'));
+            console.log(sugRoute);
+            if(sugRoute == "segmentsErr"){
+                popupElement.append('אין מספיק ימי טיול עבור נקודת ההתחלה שנבחרה. <br> נסה להוריד את ימי הטיול/את מספר הק"מ ליום'); 
+                popupElement.addClass("show");
+            } else if(sugRoute == "typeErr"){
+                popupElement.append('המסלול אינו תואם את אופי הטיול שבחרת'); 
+                popupElement.addClass("show"); 
+            } else if(sugRoute == "diffErr"){
+                popupElement.append('המסלול אינו תואם את רמת הקושי שבחרת'); 
+                popupElement.addClass("show");  
+            } else if(sugRoute == "typeDiffErr"){
+                popupElement.append('המסלול אינו תואם את אופי הטיול ואת רמת הקושי שבחרת'); 
+                popupElement.addClass("show"); 
+            } else window.location.assign("http://localhost:8080/suggested.html");
         });
     };
+
+    $scope.closePopup =function(){
+        var popupElement = angular.element(document.querySelector('#myPopup'));
+        popupElement.removeClass("show");
+    }
 }]);

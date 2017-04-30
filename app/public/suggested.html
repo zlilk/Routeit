@@ -9,30 +9,35 @@
         <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="css/style.css">
         <script src="https://apis.google.com/js/platform.js" async defer></script>   
-        <style>
-          #map {
-            height: 200px;
-            width: 500px;
-          }
-        </style>
     </head>
     <body>
-        <nav> 
-            <a id = "personalProfile" href="http://localhost:8080/userprofile.html"> personalProfile </a>
-            <a id = "dailyRoute" href="http://localhost:8080/dailyRoute.html"> dailyRoute </a>
-            <a id = "detailedPlan" href="http://localhost:8080/detailedPlan.html"> detailedPlan </a> 
-            <div class = "clear"> </div>
-        </nav>
-        <header id="suggestedHeader"> 
-        	<a href="http://localhost:8080/routeform.html"> < </a>
-            <h1> המסלול המוצע </h1>
+        <header> 
+            <button class="hamburger">&#9776;</button>
+            <a href="http://localhost:8080/dailyroute1.html"><h1 class = "appLogo"> Routeit </h1></a>
         </header>
         <main id="sugMain" ng-controller = "SuggestedController">
+            <nav class="menu">
+              <ul>
+                <a href="http://localhost:8080/userprofile.html"><li><img class = "userPic" src={{img}}><br>
+                    <h4 id = "userName"><b> {{name}} </b></h4>     
+                </li></a>
+                <a href="http://localhost:8080/myroutes.html"><li> המסלולים שלי </li></a>
+                <a href="http://localhost:8080/routeshistory.html"><li> הסטוריית מסלולים </li></a>
+                <a href="http://localhost:8080/routeform.html"><li> תכנון מסלול חדש </li></a>
+                <a href="http://localhost:8080/dailyroute1.html"><li> יום הטיול </li></a>
+              </ul>
+            </nav> 
+            <button ng-click="goBack()"> < </button> 
+            <div id = #popup>
+                <span class="popuptext" id="myPopup"> שים לב! מסלולך לא יישמר. <br> <button ng-click="stay()"> הישאר בעמוד </button> <button ng-click="back()"> חזור בכל זאת </button></span>
+            </div>
+            <h1> המסלול המוצע </h1>
             <section id="suggestedMap">
                 <div id="map"></div>
             </section>
             <section id="routeOverview">
             	<span> אזור </span> {{area}} <br>
+                <span> {{direction}} </span> <br>
             	<span> נקודת התחלה: </span> {{tripStartPt}} <br>
             	<span> נקודת סיום: </span> {{tripEndPt}} <br>
             	<span> מספר ימים: </span> {{tripDaysNum}} <br>
@@ -51,36 +56,12 @@
             <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
             <div class = "clear"> </div>
         </footer>
-        <script>
-            function initMap() {
-                var coords = JSON.parse(localStorage.getItem("suggestedCoords"));
-                var centerCoord = coords[parseInt(coords.length/2)];
-                var map = new google.maps.Map(document.getElementById('map'), {
-                  zoom: 12,
-                  center: centerCoord, //{lat: 33.240884, lng: 35.575751},
-                  mapTypeId: 'terrain'
-                });
-                var flightPath = new google.maps.Polyline({
-                  path: coords,
-                  geodesic: true,
-                  strokeColor: '#FF0000',
-                  strokeOpacity: 1.0,
-                  strokeWeight: 2
-                });
-                flightPath.setMap(map);
-            }
-            function signOut() {
-                var auth2 = gapi.auth2.getAuthInstance();
-                auth2.signOut().then(function () {
-                    console.log('User signed out.');
-                });
-                window.location.assign("");
-            }
-        </script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&callback=initMap">
+        <script src="js/suggestedMap.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&language=iw&callback=initMap">
         </script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
         <script src="js/lib/angular/angular.min.js"></script>
+        <script src="js/menu.js"></script>
         <script src="js/suggested.js"></script>
     </body>
  </html>
