@@ -188,7 +188,7 @@ chosenRoutes.controller('chosenRoutesController', ['$scope', '$http', '$compile'
                 break;
             }
         }
-        window.location.assign("http://localhost:8080/dailyroute1.html");
+        window.location.assign("http://localhost:8080/dailyroute.html");
     }
 
        $scope.showDetailedPlan = function(){

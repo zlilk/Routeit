@@ -28,10 +28,11 @@ userRoutes.controller('RoutesController', ['$scope', '$http', '$compile', functi
                 }
             }
         }
-        //if chosen currentRoute is different fron previous chosen currentRoute
+        //if chosen currentRoute is different from previous chosen currentRoute
         else {
             console.log("different route chosen! old route: " + currentRoute.trip_id);
             var oldChosenRouteElement = angular.element(document.querySelector('#route'+currentRoute.trip_id));
+            console.log(oldChosenRouteElement);
             oldChosenRouteElement.css('background','white'); 
             var chosenRouteElement = angular.element(document.querySelector('#route'+tripId));
             chosenRouteElement.css('background','yellow');

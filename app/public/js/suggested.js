@@ -23,13 +23,6 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
     }
     var suggestedCoords = JSON.stringify(tripCoordsArr);
     localStorage.setItem("suggestedCoords", suggestedCoords);
-        
-    var newTripSites = [];
-    for(var i=0; i<sugJson.trip_sites.length; i++){
-        if(i == (sugJson.trip_sites.length)-1){
-            newTripSites[i] = sugJson.trip_sites[i];
-        } else newTripSites[i] = sugJson.trip_sites[i] + ", ";
-    }
 
     var newTripType = [];
     for(var i=0; i<sugJson.trip_type.length; i++){
@@ -48,7 +41,6 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
     $scope.tripDayKm = sugJson.day_km;
     $scope.tripKm = sugJson.trip_km;
     $scope.tripDiff = sugJson.trip_difficulty;
-    $scope.tripSites = newTripSites;
     $scope.tripType = newTripType;
 
     //building all daily sections overview
@@ -59,7 +51,7 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
         '</span><br> <span>  נקודת סיום: ' +  sugJson.daily_sections[i].end_pt + 
         '</span><br> <span> מספר ק"מ: ' +  sugJson.daily_sections[i].total_km +
         '</span><br> <span> רמת קושי: ' +  sugJson.daily_sections[i].difficulty +
-        '</span><br> <span> משך: ' +  sugJson.daily_sections[i].duration + ' שעות </span> <br> <span> תיאור המסלול: ';
+        '</span><br> <span> משך: ' +  sugJson.daily_sections[i].duration + ' שעות </span> <br> <span> מאפייני המסלול: ';
         for(var j = 0; j<sugJson.daily_sections[i].description.length; j++){
             console.log(sugJson.daily_sections[i].description[j]);
             dailySec += sugJson.daily_sections[i].description[j] + '<br>';
@@ -134,6 +126,7 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
     }
 
     $scope.back = function(){
+        localStorage.setItem("suggestedBack", true);
         window.location.assign("http://localhost:8080/routeform.html");
     }
 }]);

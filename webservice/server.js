@@ -44,6 +44,18 @@ app.get('/getStartPts', function(req,res){
     });
 });
 
+app.get('/setAlert', function(req,res){
+    Segment.setAlertForSegment(function(data){
+      res.json(data);
+    });
+});
+
+app.get('/getSegments', function(req,res){
+    Segment.getAllSegments(function(data){
+      res.json(data);
+    });
+});
+
 // travelerController functions
 app.get('/createTraveler/:ml/:fn/:pi', function(req,res){
     Traveler.createTraveler(req.params.ml, req.params.fn, req.params.pi,function(data){
@@ -82,10 +94,17 @@ app.get('/saveAccomm/:ml/:id/:ac/:dn', function(req,res){
     var accommArr = (req.params.ac).split(",");
     var accommObj = {
       accomm_name: accommArr[0],
-      phone: accommArr[1]
+      phone: accommArr[1],
+      accomm_id: accommArr[2]
     };
     console.log(accommObj);
     Traveler.saveAccommToDay(req.params.ml, req.params.id, accommObj, req.params.dn, function(data){
+      res.json(data); 
+    });
+});
+
+app.get('/deleteAccomm/:ml/:id/:dn', function(req,res){
+    Traveler.deleteAccommFromDay(req.params.ml, req.params.id, req.params.dn, function(data){
       res.json(data); 
     });
 });

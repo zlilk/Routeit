@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="detailedPlan">
     <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
         <meta charset="utf-8">
         <meta name="google-signin-client_id" content="296256466166-pdh58rh53nihcc5tfh184vmautajqsup.apps.googleusercontent.com">
         <title>Detailed Plan</title>
@@ -13,20 +14,20 @@
     <body ng-controller = "planController">
         <header> 
             <button class="hamburger">&#9776;</button>
-            <a href="http://localhost:8080/dailyroute1.html"><h1 class = "appLogo"> Routeit </h1></a>
+            <a href="http://localhost:8080/dailyroute.html"><h1 class = "appLogo"> Routeit </h1></a>
         </header>
-        <main id="planMain">
-            <nav class="menu">
-              <ul>
+        <nav class="menu">
+            <ul>
                 <a href="http://localhost:8080/userprofile.html"><li><img class = "userPic" src={{img}}><br>
                     <h4 id = "userName"><b> {{name}} </b></h4>     
                 </li></a>
                 <a href="http://localhost:8080/myroutes.html"><li> המסלולים שלי </li></a>
                 <a href="http://localhost:8080/routeshistory.html"><li> הסטוריית מסלולים </li></a>
                 <a href="http://localhost:8080/routeform.html"><li> תכנון מסלול חדש </li></a>
-                <a href="http://localhost:8080/dailyroute1.html"><li> יום הטיול </li></a>
-              </ul>
-            </nav>
+                <a href="http://localhost:8080/dailyroute.html"><li> יום הטיול </li></a>
+            </ul>
+        </nav> 
+        <main id="planMain">
             <button ng-click="goBack()"> < </button> 
             <h1> {{start}} - {{end}} </h1>
             <h1>{{date}} </h1>
@@ -45,25 +46,22 @@
                     <img src="#"> {{d.duration}} <br>
                     <img src="#"> {{d.diff}} <br>
                     <img src="#">  
-                    <select class="sleepPlaces" ng-model="d[d.model]"> 
-                        <option ng-repeat = "a in d.accommArr"> {{a}} </option> 
-                    </select> 
-                    <button ng-click="saveAccomm(d[d.model], d.dayNum)"> + </button>
+                    <span id = "chosenAccomm{{d.dayNum}}">{{d.chosenAccomm}}<sup id="deleteAccomm{{d.dayNum}}" ng-click="deleteAccomm(d.dayNum)"></sup></span>
+                    <button ng-click="showAccomm(d.endPt, d.dayNum)"> עדכן מקום לינה </button>
                    <br> 
                 </p>
             </section>
-             <span id = "hi"> </span> 
+             
         </main>
         <footer> 
             <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
             <div class = "clear"> </div>
         </footer>
-        <script src="js/detailedMap.js"></script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&language=iw&callback=initMap">
-        </script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
         <script src="js/lib/angular/angular.min.js"></script>
-        <script src="js/menu.js"></script>
         <script src="js/detailedplan.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&language=iw&libraries=places&callback=initMap">
+        </script>
+        <script src="js/menu.js"></script>
     </body>
  </html>

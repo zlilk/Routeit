@@ -10,30 +10,120 @@
 }
 
 @media screen and (max-width: 480px){
+	*	{
+		margin: 0px;
+		padding: 0px;
+	}
+
 	body {
 		direction: rtl;
+		height: 100vh;
+        width: 100vw;
 	}
 
 	header {
 		width:100%; 
-		background:#ffffff; 
-		height:60px; 
+		background: #413F4C; 
+		height: 10%; 
 		line-height:60px;
 		border-bottom:1px solid #dddddd;
-		padding-bottom: 15%;
+		padding-bottom: 10%;
+		padding-top: 5%;
+		position: fixed;
+		top: 0px;
+		z-index: 20; 
 	}
 
 	main {
-		position: relative;
-		padding-top: 3%;
+		position: relative;	
+	}
+
+	.pageMain {
+		height: 90vh;
+		top: 10%;
 	}
 
 	.appLogo {
 		text-align: center;
+		font-size: 2.5em;
+		padding: 0px;
+		margin: 0px;
+	}
+
+	#dailyContent {
+		position: relative;
+	}
+
+	#dayHeadline, #dayHeadlineDiv, #noRoutesDiv, #noRoutes, #newRouteBtn, #routesExist {
+		position: absolute;
+		z-index: 100;
+	}
+
+	#dayHeadlineDiv {
+		top: 10%;
+		background: #EFA19D;
+		opacity: 0.7;
+		width: 100%;
+		height: 8%;
+	}
+
+	#dayHeadline{
+		margin: 0px;
+		font-size: 1.5em;
+		font-weight: bold;
+		padding: 4%;
+		top: 10%;
+		color: #443B4D;
+	}
+
+	#noRoutesDiv {
+		background: #9593A0;
+		opacity: 0.8;
+		width: 100%;
+		height: 8%;
+		bottom: 0px;
+	}
+
+	#noRoutes {
+		bottom: 0px;
+		padding: 3%;
+		font-size: 1.5em;
+		font-weight: bold;
+		color: #ffffff;
+		margin:0px;
+	}
+
+	#newRouteBtn {
+		bottom: 4%;
+		left: 5%;
+		background: #F35843;
+		display: block;
+		width: 15%;
+		padding: 2% 4% 2% 4%;
+		//height: 8%;
+		border-radius: 50%;
+		text-align: center;
+		font-size: 0.8em;
+		color: #ffffff; 
+	}
+
+	#routesExist {
+		bottom: 2%;
+		margin-right: auto;
+		margin-left: auto;
+		left: 0;
+		right: 0;
+		display: block;
+		width: 90%;
+		background: #F35843;
+		color: #ffffff;
+		font-weight: bold;
+		font-size: 1.4em;
+		padding: 2% 4% 2% 4%;
 	}
 
 	.backgroundMap {
-	    height:100vh; 
+	    height: 100vh;
 	    width:100%;
 	}
 
@@ -57,7 +147,7 @@
 	}
 
 	.userPic {
-		border-radius: 150px;
+		border-radius: 50%;
 	}
 
 	#dailyDayDate {
@@ -71,7 +161,7 @@
 	  right:0;
 	  line-height:45px;
 	  padding:5px 15px 0px 15px;
-	  color:#999;
+	  color:#ffffff;
 	  border:0;
 	  font-size:2.3em;
 	  font-weight:bold;
@@ -80,7 +170,7 @@
 	  z-index:10000000000000;
 	}
 
-	.menu{z-index:1000000; font-weight:bold; font-size:0.8em; width:100%; height: 100vh; background:#f1f1f1; position:absolute; text-align:center; font-size:12px; width: 50%; right: 0px; top: 0px;}
+	.menu{z-index:1000000; font-weight:bold; font-size:0.8em; width:100%; height: 65vh; background:#f1f1f1; position:absolute; text-align:center; font-size:12px; width: 50%; right: 0px; top: 10%;}
 	.menu ul {margin: 0; padding: 0; list-style-type: none; list-style-image: none;}
 	.menu li {display: block;   padding:15px 0 15px 0; border-bottom:#dddddd 1px solid;}
 	.menu li:hover{display: block;    background:#ffffff; padding:15px 0 15px 0; border-bottom:#dddddd 1px solid;}
@@ -101,7 +191,95 @@
 	a{color:#336699;}
 
 	#userProfile {
+		background: #E3F4FC;
+		border-bottom: 1px solid #D6B9B5;
+		padding: 6%;
 		text-align: center;
+	}
+	
+	#userName {
+		font-size: 1.2em;
+		font-weight: bold;
+	}
+
+	#statistics {
+		position: absolute;
+		margin-top: 7%;
+		width: 80%;
+		margin-right: auto;
+		margin-left: auto;
+		left: 0;
+		right: 0;
+	}
+
+	.doneStatistic {
+		float: right;
+		padding: 2%;
+		text-align: center;
+		border-right: 1px solid #D6B9B5;
+		border-left: 1px solid #D6B9B5;
+		border-collapse: collapse;
+		width: 50%;
+	}
+
+	#signOut {
+		display: block;
+		background: #F35844;
+		width: 15%;
+		padding: 2%;
+		color: #ffffff;
+		font-size: 1em;
+		margin: 0px auto;
+	}
+
+	#signOutSec{
+		position: absolute;
+		bottom: 4%;
+		margin-right: auto;
+		margin-left: auto;
+		left: 0;
+		right: 0;
+		border-top: 1px solid #D6B9B5;
+		padding-top: 6%;
+	}
+
+	.pageHead {
+		width: 100%;
+		background: #D9F1FB;
+		text-align: center;
+		margin-top: 0px;
+		padding: 2%;
+	}
+
+	#routeForm {
+		width: 90%;
+		margin:0px auto;
+	}
+
+	#routeForm label {
+		color: #E65C48;
+		font-size: 1em;
+		margin-top: 4%;
+	}
+
+	#routeForm select, #routeForm input {
+		width: 100%;
+		padding: 1%;
+		border: none;
+		background: #D9F1FB;
+	}
+
+	#submitSec{
+		width: 100%;
+		text-align: center;
+		padding: 10%;
+	}
+
+	#planBtn {
+		padding: 3% 15% 3% 15%;
+		border: none;
+		background: #40404A;
+		color: #DCF3F9;
 	}
 
 	#popup {
@@ -166,5 +344,51 @@
 	@keyframes fadeIn {
 	    from {opacity: 0;}
 	    to {opacity:1 ;}
+	}
+
+	.placeIcon {
+	  	width: 20px;
+	  	height: 34px;
+	  	margin: 4px;
+	}
+
+	.hotelIcon {
+	  	width: 24px;
+	  	height: 24px;
+	}
+
+	#rating {
+	  	font-size: 13px;
+	  	font-family: Arial Unicode MS;
+	}
+
+	.iw_table_row {
+	  	height: 18px;
+	}
+
+	.iw_attribute_name {
+	  	font-weight: bold;
+	  	text-align: right;
+	}
+
+	.iw_table_icon {
+	  	text-align: right;
+	}
+
+	#info-content table{
+		height: 100px;
+		overflow-y: auto;
+	}
+
+	#info_wrapper {
+		display: none;
+	}
+
+	#deleteAc {
+		//display: none;
+	}
+
+	#windowContent {
+		font-size: 11px;
 	}
 }
