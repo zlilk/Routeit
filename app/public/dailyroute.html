@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="dailyRoute">
     <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
         <meta charset="utf-8">
         <meta name="google-signin-client_id" content="296256466166-pdh58rh53nihcc5tfh184vmautajqsup.apps.googleusercontent.com">
         <title>Daily Route</title>
@@ -15,36 +16,38 @@
     <body ng-controller = "dailyController">
         <header> 
             <button class="hamburger">&#9776;</button>
-            <a href="http://localhost:8080/dailyroute1.html"><h1 class = "appLogo"> Routeit </h1></a>
+            <a class = "appLogo" href="http://localhost:8080/dailyroute.html"></a>
         </header>
-        <main>
-            <nav class="menu">
-              <ul>
+        <nav class="menu">
+            <ul>
                 <a href="http://localhost:8080/userprofile.html"><li><img class = "userPic" src={{img}}><br>
                     <h4 id = "userName"><b> {{name}} </b></h4>     
                 </li></a>
-                <a href="http://localhost:8080/myroutes.html"><li> המסלולים שלי </li></a>
-                <a href="http://localhost:8080/routeshistory.html"><li> הסטוריית מסלולים </li></a>
-                <a href="http://localhost:8080/routeform.html"><li> תכנון מסלול חדש </li></a>
-                <a href="http://localhost:8080/dailyroute1.html"><li> יום הטיול </li></a>
-              </ul>
-            </nav> 
+                <a href="http://localhost:8080/myroutes.html"><li id="myRoutesLi"> המסלולים שלי </li></a>
+                <a href="http://localhost:8080/routeshistory.html"><li id="historyLi"> הסטוריית מסלולים </li></a>
+                <a href="http://localhost:8080/routeform.html"><li id="planLi"> תכנון מסלול חדש </li></a>
+                <a href="http://localhost:8080/dailyroute.html"><li id="dailyLi" class="selected"> יום הטיול </li></a>
+            </ul>
+        </nav> 
+        <main>
             <div id = #popup>
-                <span class="popuptext" id="myPopup"> האם אתה בטוח שברצונך להפסיק את הטיול? <br> <button ng-click="stay()"> הישאר בטיול </button> <button ng-click="stop()"> הפסק טיול </button></span>
+                <span class="popuptext" id="endPopup"> האם אתה בטוח שברצונך להפסיק את הטיול? <br> <button ng-click="stay()"> הישאר בטיול </button> <button ng-click="stop()"> הפסק טיול </button></span>
+            </div>
+            <div id = #popup>
+                <span class="popuptext" id="alertPopup"> התראתך נשלחה בהצלחה! <span id="x" ng-click="closePopup()">&#10005;</span></span>
             </div>
             <section id="dailyContent">
-              <!--  <div id="map"></div>  -->
             </section>
         </main>
         <footer> 
             <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
         </footer>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&language=iw&callback=initMap">
-        </script>
         <script src="js/dailyMap.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&language=iw&libraries=places&callback=initMap">
+        </script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
         <script src="js/lib/angular/angular.min.js"></script>
-        <script src="js/dailyroute1.js"></script>
+        <script src="js/dailyroute.js"></script>
         <script src="js/menu.js"></script>
     </body>
  </html>

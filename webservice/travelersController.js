@@ -3,7 +3,6 @@ var Traveler = require('./traveler');
 
 // if user doesn't exist, create new user and adding it to the database
 exports.createTraveler = function(mail, name, pic, callback){
-    console.log("I'm here");
     var newchar = '/';
     pic = pic.split('*').join(newchar);
     var query = Traveler.find({}).select('email');
@@ -44,15 +43,14 @@ exports.addRouteToTraveler = function(id, mail, callback){
           coord.lng = coordArr[j].lng;
           coordArray.push(coord);
         }
-
-        var accommArray = []; //contains all of daily section's accommodation places
-        var acoommArr = route.daily_sections[i].accomm_array; 
-        for(var j = 0; j<acoommArr.length; j++){
-          var accomm = {}; //object representing an accommodation place
-          accomm.accomm_name = acoommArr[j].accomm_name;
-          accomm.phone = acoommArr[j].phone;
-          accommArray.push(accomm);
-        }
+        /*var alertArray = [];
+        var alertArr = route.daily_sections[i].alert;
+        for(var j=0; j<alertArr; j++){
+          var alert = {};
+          alert.content = alertArr[j].content;
+          alert.coord = alertArr[j].coord;
+          alertArray.push(alert);
+        }*/
 
         //a trip's daily section
         var dailySection = { 
@@ -60,18 +58,15 @@ exports.addRouteToTraveler = function(id, mail, callback){
           date: route.daily_sections[i].date,
           start_pt: route.daily_sections[i].start_pt,
           end_pt: route.daily_sections[i].end_pt,
-          start_coord: route.daily_sections[i].start_coord,
-          end_coord: route.daily_sections[i].end_coord,
           coord_array: coordArray,
           total_km: route.daily_sections[i].total_km,
           area: route.daily_sections[i].area,
           duration: route.daily_sections[i].duration,
           difficulty: route.daily_sections[i].difficulty,
           alert: route.daily_sections[i].alert,
-          accomm_array: accommArray,
-          chosen_accomm: "",
+          //alert: alertArray,
+          chosen_accomm: null,
           description: route.daily_sections[i].description,
-          sites: route.daily_sections[i].sites,
           type: route.daily_sections[i].type
         };
       dailySectionsArr.push(dailySection);
@@ -91,7 +86,6 @@ exports.addRouteToTraveler = function(id, mail, callback){
           trip_km: route.trip_km,
           day_km: route.day_km,
           trip_difficulty: route.trip_difficulty,
-          trip_sites: route.trip_sites,
           trip_type: route.trip_type,
           trip_description: route.trip_description,
           daily_sections: dailySectionsArr
@@ -162,6 +156,38 @@ exports.updateTripDates = function(mail, tripId, sDate, daysNum, isFri, isSat, c
     });
 }
 
+//delete trip dates and daily sections dates
+exports.deleteTripDates = function(mail, tripId, callback){  
+  //delete trip dates from traveler's trip
+  var query = Traveler.findOne().where('email', mail).select('my_routes');
+    query.exec(function(err,routes){
+      if(err) callback("myRoutesNotFound");
+      var myRoutes = routes.my_routes;
+      var isRouteFound = false;
+      for(var i = 0; i<myRoutes.length; i++){
+        if(myRoutes[i].trip_id == tripId){
+          var isRouteFound = true;
+          myRoutes[i].end_date = null;
+          myRoutes[i].start_date = null;
+          var dailySecs = myRoutes[i].daily_sections;
+          for(var j = 0; j<dailySecs.length; j++){
+            dailySecs[j].date = null;
+          }
+          var updatedRoute = myRoutes[i];
+          break;
+        }
+      }
+      if(isRouteFound == true){
+        routes.set('my_routes', myRoutes);
+        routes.save();
+        //callback("datesUpdated");
+        callback(updatedRoute);
+      }
+      else callback("routeNotFound"); 
+    });
+}
+
+
 // delete a certain trip by trip id
 exports.deleteRouteFromTraveler = function(mail, tripId, callback){
    var query = Traveler.findOneAndUpdate({email: mail}, {$pull: {my_routes: {trip_id: tripId}}});
@@ -216,6 +242,33 @@ exports.saveAccommToDay = function(mail, tripId, accomm, dayNum, callback){
   });
 }
 
+exports.deleteAccommFromDay = function(mail, tripId, dayNum, callback){
+  var query = Traveler.findOne().where('email', mail).select('my_routes');
+  query.exec(function(err,routes){
+  if(err) callback("myRoutesNotFound");
+    var isRouteFound = false;
+    var myRoutes = routes.my_routes;
+    for(var i = 0; i<myRoutes.length; i++){
+      if(myRoutes[i].trip_id == tripId){
+        isRouteFound = true;
+        var dailySecs = myRoutes[i].daily_sections;
+        for(var j = 0; j<dailySecs.length; j++){
+          if(dailySecs[j].day_num == dayNum){
+             dailySecs[j].chosen_accomm = "";
+          }
+        }
+        break;
+      }
+    }
+    if(isRouteFound == true){
+      routes.set('my_routes', myRoutes);
+      routes.save();
+      callback("accommDeleted"); 
+    }
+    else callback("routeNotFound");
+  });
+}
+
 exports.getAllMyRoutes = function(mail, callback){
   var query = Traveler.findOne().where('email', mail).select('my_routes');
     query.exec(function(err,routes){
@@ -247,7 +300,6 @@ exports.addPrevToTraveler = function(mail, callback){
     trip_km: 10,
     day_km: "עד 5",
     trip_difficulty: "המסלול ברובו ברמת קושי בינונית",
-    trip_sites: ["מבצר לטרון"],
     trip_type: ["מתאים למשפחות"],
     trip_description: ["מסלול ירוק", "נוף מרהיב", "מתאים לכל עונות השנה"],
   };*/
@@ -265,7 +317,6 @@ exports.addPrevToTraveler = function(mail, callback){
     trip_km: 22,
     day_km: "5-10",
     trip_difficulty: "המסלול ברובו ברמת קושי קשה",
-    trip_sites: ["המכתש הקטן"],
     trip_type: ["מאתגר"],
     trip_description: ["מכיל עליות", "נוף מרהיב", "מתאים לכל עונות השנה"],
   };
@@ -298,33 +349,20 @@ exports.addRouteToSuggested = function(route, mail, callback){
       coordArray.push(coord);
     }
 
-    var accommArray = []; //contains all of daily section's accommodation places
-    var acoommArr = route.daily_sections[i].accomm_array; 
-    for(var j = 0; j<acoommArr.length; j++){
-      var accomm = {}; //object representing an accommodation place
-      accomm.accomm_name = acoommArr[j].accomm_name;
-      accomm.phone = acoommArr[j].phone;
-      accommArray.push(accomm);
-    }
-
     //a trip's daily section
     var dailySection = { 
       day_num: route.daily_sections[i].day_num,
       date: route.daily_sections[i].date,
       start_pt: route.daily_sections[i].start_pt,
       end_pt: route.daily_sections[i].end_pt,
-      start_coord: route.daily_sections[i].start_coord,
-      end_coord: route.daily_sections[i].end_coord,
       coord_array: coordArray,
       total_km: route.daily_sections[i].total_km,
       area: route.daily_sections[i].area,
       duration: route.daily_sections[i].duration,
       difficulty: route.daily_sections[i].difficulty,
       alert: route.daily_sections[i].alert,
-      accomm_array: accommArray,
-      chosen_accomm: "",
+      chosen_accomm: null,
       description: route.daily_sections[i].description,
-      sites: route.daily_sections[i].sites,
       type: route.daily_sections[i].type
     };
   dailySectionsArr.push(dailySection);
@@ -344,7 +382,6 @@ exports.addRouteToSuggested = function(route, mail, callback){
       trip_km: route.trip_km,
       day_km: route.day_km,
       trip_difficulty: route.trip_difficulty,
-      trip_sites: route.trip_sites,
       trip_type: route.trip_type,
       trip_description: route.trip_description,
       daily_sections: dailySectionsArr

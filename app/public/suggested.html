@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="suggestedRoute">
     <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
         <meta charset="utf-8">
         <meta name="google-signin-client_id" content="296256466166-pdh58rh53nihcc5tfh184vmautajqsup.apps.googleusercontent.com">
         <title>Suggested Route</title>
@@ -10,23 +11,23 @@
         <link rel="stylesheet" href="css/style.css">
         <script src="https://apis.google.com/js/platform.js" async defer></script>   
     </head>
-    <body>
+    <body ng-controller = "SuggestedController">
         <header> 
             <button class="hamburger">&#9776;</button>
-            <a href="http://localhost:8080/dailyroute1.html"><h1 class = "appLogo"> Routeit </h1></a>
+            <a class = "appLogo" href="http://localhost:8080/dailyroute.html"></a>
         </header>
-        <main id="sugMain" ng-controller = "SuggestedController">
-            <nav class="menu">
-              <ul>
+        <nav class="menu">
+            <ul>
                 <a href="http://localhost:8080/userprofile.html"><li><img class = "userPic" src={{img}}><br>
                     <h4 id = "userName"><b> {{name}} </b></h4>     
                 </li></a>
-                <a href="http://localhost:8080/myroutes.html"><li> המסלולים שלי </li></a>
-                <a href="http://localhost:8080/routeshistory.html"><li> הסטוריית מסלולים </li></a>
-                <a href="http://localhost:8080/routeform.html"><li> תכנון מסלול חדש </li></a>
-                <a href="http://localhost:8080/dailyroute1.html"><li> יום הטיול </li></a>
-              </ul>
-            </nav> 
+                <a href="http://localhost:8080/myroutes.html"><li id="myRoutesLi"> המסלולים שלי </li></a>
+                <a href="http://localhost:8080/routeshistory.html"><li id="historyLi"> הסטוריית מסלולים </li></a>
+                <a href="http://localhost:8080/routeform.html"><li id="planLi"> תכנון מסלול חדש </li></a>
+                <a href="http://localhost:8080/dailyroute.html"><li id="dailyLi"> יום הטיול </li></a>
+            </ul>
+        </nav> 
+        <main id="sugMain">
             <button ng-click="goBack()"> < </button> 
             <div id = #popup>
                 <span class="popuptext" id="myPopup"> שים לב! מסלולך לא יישמר. <br> <button ng-click="stay()"> הישאר בעמוד </button> <button ng-click="back()"> חזור בכל זאת </button></span>
@@ -45,7 +46,6 @@
             	<span> מספר ק"מ כולל: </span> {{tripKm}} <br>
             	<span> רמת קושי: </span> {{tripDiff}} <br>
             	אופי הטיול: <span ng-repeat = "type in tripType"> {{type}} </span> <br>
-            	אתרים בדרך: <span ng-repeat = "site in tripSites"> {{site}} </span>
             	<button ng-click="addRoute()"> + </button>
             	<button ng-click="showHide()"> ^ </button>
                 <br><br>

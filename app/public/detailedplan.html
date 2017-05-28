@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="detailedPlan">
     <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
         <meta charset="utf-8">
         <meta name="google-signin-client_id" content="296256466166-pdh58rh53nihcc5tfh184vmautajqsup.apps.googleusercontent.com">
         <title>Detailed Plan</title>
@@ -13,57 +14,60 @@
     <body ng-controller = "planController">
         <header> 
             <button class="hamburger">&#9776;</button>
-            <a href="http://localhost:8080/dailyroute1.html"><h1 class = "appLogo"> Routeit </h1></a>
+            <a class = "appLogo" href="http://localhost:8080/dailyroute.html"></a>
+            <button id="back" class="back" ng-click="goBack()">  &#10095; </button> 
         </header>
-        <main id="planMain">
-            <nav class="menu">
-              <ul>
+        <nav class="menu">
+            <ul>
                 <a href="http://localhost:8080/userprofile.html"><li><img class = "userPic" src={{img}}><br>
                     <h4 id = "userName"><b> {{name}} </b></h4>     
                 </li></a>
-                <a href="http://localhost:8080/myroutes.html"><li> המסלולים שלי </li></a>
-                <a href="http://localhost:8080/routeshistory.html"><li> הסטוריית מסלולים </li></a>
-                <a href="http://localhost:8080/routeform.html"><li> תכנון מסלול חדש </li></a>
-                <a href="http://localhost:8080/dailyroute1.html"><li> יום הטיול </li></a>
-              </ul>
-            </nav>
-            <button ng-click="goBack()"> < </button> 
-            <h1> {{start}} - {{end}} </h1>
-            <h1>{{date}} </h1>
+                <a href="http://localhost:8080/myroutes.html"><li id="myRoutesLi"> המסלולים שלי </li></a>
+                <a href="http://localhost:8080/routeshistory.html"><li id="historyLi"> הסטוריית מסלולים </li></a>
+                <a href="http://localhost:8080/routeform.html"><li id="planLi"> תכנון מסלול חדש </li></a>
+                <a href="http://localhost:8080/dailyroute.html"><li id="dailyLi"> יום הטיול </li></a>
+            </ul>
+        </nav> 
+        <main class="pageMain" id="detailedMain">
             <section id="tripMap">
                 <div id="map"></div>
             </section>
-            <section class = "tripDay" ng-repeat = "d in dailySections">
-                <p class = "dayDate">
-                    {{d.dayNum}} <br>
-                    {{d.dayDate}} <br>
-                    {{d.weekDay}} <br>
-                </p>
-                <p class = "dayDetails">
-                    <img src="#"> {{d.startPt}} - {{d.endPt}} <br>
-                    <img src="#"> {{d.km}} <br>
-                    <img src="#"> {{d.duration}} <br>
-                    <img src="#"> {{d.diff}} <br>
-                    <img src="#">  
-                    <select class="sleepPlaces" ng-model="d[d.model]"> 
-                        <option ng-repeat = "a in d.accommArr"> {{a}} </option> 
-                    </select> 
-                    <button ng-click="saveAccomm(d[d.model], d.dayNum)"> + </button>
-                   <br> 
-                </p>
+            <div id="detailedHeadlineDiv"></div>
+            <h1 id="detailedHeadline"> {{start}} - {{end}}</h1>
+            <h1 id="detailedDate">{{date}}</h1>
+            <section id="tripDays">
+                <section class = "tripDay" ng-repeat = "d in dailySections">
+                    <div class = "dayDate">
+                        יום {{d.dayNum}}: {{d.dayDate}}, {{d.weekDay}}
+                    </div>
+                    <div class = "dayDetails">
+                        <p class="dayDetail">
+                        <img src="images/FROM_WHERE_TO.png"><br><span class="detailContent"> מ{{d.startPt}} ל{{d.endPt}}</span></p>
+                        <p class="dayDetail">
+                        <img src="images/KM.png"><br> <span class="detailContent">{{d.km}}<br> ק"מ </span></p>
+                        <p class="dayDetail">
+                        <img src="images/TIME.png"><br>{{d.duration}}<br> שעות </p>
+                        <p class="dayDetail">
+                        <img src="images/DIFFICULTY.png"><br> {{d.diff}} </p> 
+                        <p class="dayDetail">
+                        <img src="images/SLEEPING_PLACE.png"><br> 
+                        <!-- <span id = "chosenAccomm{{d.dayNum}}">{{d.chosenAccomm}}<sup id="deleteAccomm{{d.dayNum}}" ng-click="deleteAccomm(d.dayNum)"></sup></span> -->
+                        <button id="accommBtn" ng-click="showAccomm(d.endPt, d.dayNum)"> עדכן מקום לינה </button></p>
+                       <div class="clear"></div> 
+                    </div>
+                </section>
             </section>
-             <span id = "hi"> </span> 
+             
         </main>
         <footer> 
             <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
             <div class = "clear"> </div>
         </footer>
-        <script src="js/detailedMap.js"></script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&language=iw&callback=initMap">
-        </script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
         <script src="js/lib/angular/angular.min.js"></script>
-        <script src="js/menu.js"></script>
         <script src="js/detailedplan.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&language=iw&libraries=places&callback=initMap">
+        </script>
+        <script src="js/menu.js"></script>
     </body>
  </html>

@@ -6,7 +6,8 @@ var schema = mongoose.Schema;
 
 var accomm = new schema({
     accomm_name: String,
-    phone: String
+    phone: String,
+    accomm_id: String
 });
 
 var coord = new schema({
@@ -14,13 +15,16 @@ var coord = new schema({
     lng: String
 });
 
+var alert = new schema({
+    content: String,
+    coord: coord
+});
+
 var daily_section = new schema({ 
     day_num: {type:Number, index:1, required:true, unique:true},
     date: Date,
     start_pt: String,
     end_pt: String,
-    start_coord: coord,
-    end_coord: coord,
     coord_array: [coord],
     total_km: {
         type: SchemaTypes.Double
@@ -28,11 +32,9 @@ var daily_section = new schema({
     area: String,
     duration: String,
     difficulty: String,
-    alert: [String],
-    accomm_array: [accomm],
+    alert: [alert],
     chosen_accomm: accomm,
     description: [String],
-    sites: [String],
     type: [String]
 });
 
@@ -49,7 +51,6 @@ var route = new schema({
     trip_km: Number,
     day_km: String,
     trip_difficulty: String,
-    trip_sites: [String],
     trip_type: [String],
     trip_description: [String],
     daily_sections: [daily_section]
@@ -68,7 +69,6 @@ var prevRoute = new schema({
     trip_km: Number,
     day_km: String,
     trip_difficulty: String,
-    trip_sites: [String],
     trip_type: [String],
     trip_description: [String]
 });

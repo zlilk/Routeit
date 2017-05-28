@@ -26,7 +26,7 @@ login.controller('UserController', ['$scope','$http', function($scope, $http){
                 localStorage.setItem("dailyRoutes", null);
                 localStorage.setItem("currentDailyRoute", null);
             }
-            window.location.assign("http://localhost:8080/userprofile.html");
+            window.location.assign("http://localhost:8080/dailyroute.html");
         });
     }
 

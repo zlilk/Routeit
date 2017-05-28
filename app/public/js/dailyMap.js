@@ -4,17 +4,31 @@ function initMap() {
     //if there isn't a current trip for the current day
     //if(myRoutes == null || myRoutes == "[]" || chosenRoute == "null"){
     console.log("chosen in js: "+ chosenRoute);
+    if(chosenRoute != null){
+        var currentDate = new Date(); //today's date
+        var foundDay = false; //flag to check if the trip days have the current date
+        for(var i = 0; i< chosenRoute.daily_sections.length; i++){
+            var tmpDate = new Date(chosenRoute.daily_sections[i].date);
+            if((currentDate.getDate() == tmpDate.getDate()) && (currentDate.getMonth() == tmpDate.getMonth()) && (currentDate.getFullYear() == tmpDate.getFullYear())){
+                currentDayPos = i;
+                foundDay = true;
+            }  
+        }
+        console.log(foundDay);
+        if(foundDay == false) localStorage.setItem("chosenRoute", null);
+    }
+    var chosenRoute = JSON.parse(localStorage.getItem("chosenRoute"));
     if(chosenRoute == null){
-         document.getElementById('map').className = 'backgroundMap';
          navigator.geolocation.getCurrentPosition(function(position){
             window.lat = position.coords.latitude;
             window.lng = position.coords.longitude;
             map  = new google.maps.Map(document.getElementById('map'), {
                 center:{lat:window.lat, lng:window.lng},
                 zoom:13,
-                mapTypeId:google.maps.MapTypeId.ROAD
+                mapTypeId: google.maps.MapTypeId.ROAD
             });
             var mark = new google.maps.Marker({position:{lat:lat, lng:lng}, map:map});
+            document.getElementById('map').className = 'backgroundMap';
         });
     }
     //if there is a chosen trip for the current day
@@ -45,7 +59,7 @@ function initMap() {
             }
         }
         var centerCoord = dailyCoordsArray[parseInt(dailyCoordsArray.length/2)];
-        
+
         var map; //holds the google map
         var mark; //pin on map that shows user's position
 
@@ -93,6 +107,7 @@ function initMap() {
                 zoom:13,
                 mapTypeId:google.maps.MapTypeId.ROAD
             });
+
             //draws the route by its coordinates
             var lineCoordinatesPath = new google.maps.Polyline({
                 path: dailyCoordsArray,
@@ -102,6 +117,58 @@ function initMap() {
                 strokeWeight: 4
             });
             lineCoordinatesPath.setMap(map);
+            
+            var dayAlerts = chosenRoute.daily_sections[currentDayPos].alert;
+            var alertMarkers = [];
+            if(dayAlerts.length != 0){
+                for(var i =0; i<dayAlerts.length; i++){
+                    console.log(dayAlerts[i]);
+                    var coord = {
+                        lat: Number(dayAlerts[i].coord.lat),
+                        lng: Number(dayAlerts[i].coord.lng)
+                    }
+                    alertMarkers[i] = new google.maps.Marker({
+                        position: coord,
+                        map: map,
+                        title: dayAlerts[i].content
+                    });
+                    var infowindow = new google.maps.InfoWindow();
+                    google.maps.event.addListener(alertMarkers[i], 'click', function() {
+                        var marker = this;
+                        var content = '<div id="alertContent">' + this.title +'</div>';   
+                        infowindow.setContent(content);
+                        infowindow.open(map, this);
+                    });
+                }
+            }
+
+            //adding a pin with the chosen accomm for the day
+            if(chosenRoute.daily_sections[currentDayPos].chosen_accomm != null){
+                console.log(chosenRoute.daily_sections[currentDayPos].chosen_accomm);
+                var infowindow = new google.maps.InfoWindow();
+                var service = new google.maps.places.PlacesService(map);
+
+                service.getDetails({
+                  placeId: chosenRoute.daily_sections[currentDayPos].chosen_accomm.accomm_id
+                }, function(place, status) {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            position: place.geometry.location
+                        });
+                        google.maps.event.addListener(marker, 'click', function() {
+                            var content = '<div><strong>' + place.name + '</strong><br>' + place.vicinity + '<br>'; 
+                            if(place.formatted_phone_number) {
+                                content += place.formatted_phone_number;
+                            }
+                            content+='</div>';
+                            infowindow.setContent(content);
+                            infowindow.open(map, this);
+                        });
+                    }
+                });
+            }
+
             //add the 'my locaiton' button
             var centerControlDiv = document.createElement('div');
             var centerControl = new CenterControl(centerControlDiv, map);

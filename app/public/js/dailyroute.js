@@ -9,9 +9,9 @@ dailyRoute.controller('dailyController', ['$scope', '$http', '$compile', functio
     var currentDate = new Date(); //today's trip date
     var currentDateStr = currentDate.getDate() + "/" + (currentDate.getMonth()+1) + "/" + currentDate.getFullYear();
     var currentWeekDay = currentDate.getDay();
-    var daysArr = ["יום א'", "יום ב'", "יום ג'", "יום ד'", "יום ה'", "יום ו'", "יום ש'"];
+    var daysArr = ["יום ראשון", "יום שני", "יום שלישי", "יום רביעי", "יום חמישי", "יום שישי", "יום שבת"];
     var currentDayStr = daysArr[currentWeekDay];
-    var noRoutesContent = '<div id = "map"></div><h1>' + currentDayStr + ' ' + currentDateStr + '</h1><p> אין מסלול מתוכנן עבור יום זה </p><a href="http://localhost:8080/routeform.html">תכנן מסלול חדש</a>';
+    var noRoutesContent = '<div id = "map"></div><div id="dayHeadlineDiv"></div><h1 id="dayHeadline">' + currentDayStr + ', ' + currentDateStr + '</h1><div id="noRoutesDiv"></div><p id="noRoutes"> אין מסלול מתוכנן עבור יום זה </p><a id="newRouteBtn" href="http://localhost:8080/routeform.html">תכנן <br> מסלול <br> חדש</a>';
     var htmlContent;
     var dailyContent = angular.element(document.querySelector('#dailyContent'));
     
@@ -23,7 +23,6 @@ dailyRoute.controller('dailyController', ['$scope', '$http', '$compile', functio
     //if the user has routes
     else {
         chosenRoute = localStorage.getItem("chosenRoute");
-        console.log(chosenRoute);
         //if there is a chosen route for the day 
         if(chosenRoute != "null"){
             console.log("there is a chosen route planned for today");
@@ -42,7 +41,7 @@ dailyRoute.controller('dailyController', ['$scope', '$http', '$compile', functio
                     var dayNum = chosenRoute.daily_sections[i].day_num;
                     var daysNum = chosenRoute.days_num;
                     //if the traveler didn't choose accommodation
-                    if(chosenRoute.daily_sections[i].chosen_accomm.accomm_name == null) {
+                    if(chosenRoute.daily_sections[i].chosen_accomm == null) {
                         var accommName = "לא נבחר מקום לינה ליום זה";
                         var accommPhone = "";
                         //if the traveler chose accommodation
@@ -51,7 +50,6 @@ dailyRoute.controller('dailyController', ['$scope', '$http', '$compile', functio
                         var accommPhone = chosenRoute.daily_sections[i].chosen_accomm.phone;
                     }
                     var descriptionArr = [];
-                    var sitesArr = [];
                     var alertsArr = [];
                             
                     htmlContent += '<h3 id="dailyStartEnd">' + start + ' - ' + end + '</h3><div id="map"></div><br><section id = "dailyDetails">';
@@ -65,7 +63,8 @@ dailyRoute.controller('dailyController', ['$scope', '$http', '$compile', functio
                     for(var j=0; j<chosenRoute.daily_sections[i].description.length; j++){
                         htmlContent += chosenRoute.daily_sections[i].description[j] + '<br>';
                     }
-                    htmlContent += '</p><button class="endTrip" ng-click="endTrip()"> הפסק טיול </button></section>';
+                    htmlContent+= '</p><textarea id="alertText" ng-model="alertText" placeholder="הוסף התראה..."> </textarea><br><button ng-click="addAlert()"> הוסף התראה </button><br>' 
+                    +'<button class="endTrip" ng-click="endTrip()"> הפסק טיול </button></section>';
                     var linkingFunction = $compile(htmlContent);
                     var elem = linkingFunction($scope);
                     dailyContent.html(elem);
@@ -88,12 +87,12 @@ dailyRoute.controller('dailyController', ['$scope', '$http', '$compile', functio
                 console.log("there are no routes starts on this date");
                 dailyContent.html(noRoutesContent);
             }
-            //if the user has rouetes for the curret day that weren't chosen yet
+            //if the user has routes for the curret day that weren't chosen yet
             else {
                 //localStorage.setItem("currentDailyRoute", JSON.stringify(dailyRoutesArr[0]));
                 console.log("there are routes planned for today");
-                htmlContent = '<div id = "map"></div><h1>' + currentDayStr + ' ' + currentDateStr + '</h1>' +
-                '<p> קיימ/ים מסלול/ים מתוכנן/ים עבור יום זה </p><a href="http://localhost:8080/chosenroutes.html"> <- </a>';
+                htmlContent = '<div id = "map"></div><div id="dayHeadlineDiv"></div><h1 id="dayHeadline">' + currentDayStr + ', ' + currentDateStr + '</h1>' +
+                '<a id="routesExist" href="http://localhost:8080/chosenroutes.html"> קיים/ים מסלול/ים עבור יום זה &nbsp;&nbsp;&nbsp; >> </a>';
                 dailyContent.html(htmlContent);
             }
         }
@@ -105,17 +104,29 @@ dailyRoute.controller('dailyController', ['$scope', '$http', '$compile', functio
     }
 
     $scope.endTrip = function(){
-        var popupElement = angular.element(document.querySelector('#myPopup'));
+        var popupElement = angular.element(document.querySelector('#endPopup'));
         popupElement.addClass("show");   
     }
 
     $scope.stay = function(){
-        var popupElement = angular.element(document.querySelector('#myPopup'));
+        var popupElement = angular.element(document.querySelector('#endPopup'));
         popupElement.removeClass("show");
     }
 
     $scope.stop = function(){
         localStorage.setItem("chosenRoute", null);
         location.reload();
+    }
+
+    $scope.addAlert = function(){
+        var popupElement = angular.element(document.querySelector('#alertPopup'));
+        var alertTextElement = angular.element(document.querySelector('#alertText'));
+        popupElement.addClass("show");
+        $scope.alertText ='';
+    }
+
+    $scope.closePopup =function(){
+        var popupElement = angular.element(document.querySelector('#alertPopup'));
+        popupElement.removeClass("show");
     }
 }]);
