@@ -156,6 +156,38 @@ exports.updateTripDates = function(mail, tripId, sDate, daysNum, isFri, isSat, c
     });
 }
 
+//delete trip dates and daily sections dates
+exports.deleteTripDates = function(mail, tripId, callback){  
+  //delete trip dates from traveler's trip
+  var query = Traveler.findOne().where('email', mail).select('my_routes');
+    query.exec(function(err,routes){
+      if(err) callback("myRoutesNotFound");
+      var myRoutes = routes.my_routes;
+      var isRouteFound = false;
+      for(var i = 0; i<myRoutes.length; i++){
+        if(myRoutes[i].trip_id == tripId){
+          var isRouteFound = true;
+          myRoutes[i].end_date = null;
+          myRoutes[i].start_date = null;
+          var dailySecs = myRoutes[i].daily_sections;
+          for(var j = 0; j<dailySecs.length; j++){
+            dailySecs[j].date = null;
+          }
+          var updatedRoute = myRoutes[i];
+          break;
+        }
+      }
+      if(isRouteFound == true){
+        routes.set('my_routes', myRoutes);
+        routes.save();
+        //callback("datesUpdated");
+        callback(updatedRoute);
+      }
+      else callback("routeNotFound"); 
+    });
+}
+
+
 // delete a certain trip by trip id
 exports.deleteRouteFromTraveler = function(mail, tripId, callback){
    var query = Traveler.findOneAndUpdate({email: mail}, {$pull: {my_routes: {trip_id: tripId}}});

@@ -78,6 +78,12 @@ app.get('/updateDates/:ml/:id/:sd/:dn/:fr/:st', function(req,res){
     });
 });
 
+app.get('/deleteDates/:ml/:id', function(req,res){
+    Traveler.deleteTripDates(req.params.ml, req.params.id, function(data){
+      res.json(data); 
+    });
+});
+
 app.get('/deleteRoute/:ml/:id', function(req,res){
     Traveler.deleteRouteFromTraveler(req.params.ml, req.params.id, function(data){
       res.json(data); 

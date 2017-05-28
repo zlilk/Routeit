@@ -87,7 +87,7 @@ dailyRoute.controller('dailyController', ['$scope', '$http', '$compile', functio
                 console.log("there are no routes starts on this date");
                 dailyContent.html(noRoutesContent);
             }
-            //if the user has rouetes for the curret day that weren't chosen yet
+            //if the user has routes for the curret day that weren't chosen yet
             else {
                 //localStorage.setItem("currentDailyRoute", JSON.stringify(dailyRoutesArr[0]));
                 console.log("there are routes planned for today");

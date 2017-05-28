@@ -22,6 +22,7 @@ userProfile.controller('ProfileController', ['$rootScope', '$scope', '$http', fu
        	for(var i=0; i<prevRoutesArr.length; i++){
        		$scope.tripsKm+=prevRoutesArr[i].trip_km; 	
        	}
+
     }
     
     var unbindHandler = $rootScope.$on('init', function($scope){

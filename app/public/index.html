@@ -13,17 +13,29 @@
         <script src="https://apis.google.com/js/platform.js" async defer></script>
     </head>
     <body id = "indexBody">
-        <main ng-controller = "UserController">
+        <main id="indexMain" ng-controller = "UserController">
+            <img id="signPic" src="images/PIC_SIGN_IN.png">
             <section id = "indexWrap">
-                <h1 id = "indexHead"> השביל </h1>
+                <img id = "bigLogo" src = "images/bigLogo.png">
                 <div id = "signInIndex"> 
-                    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+                    <div class="g-signin2 btn-google" data-onsuccess="onSignIn"></div>
                 </div>
-                <a href ="#" class="btn btn-default" id = "signOut" onclick="signOut();">התנתק</a>
             </section>
         </main>
         <script>
-            function onSignIn(googleUser) {}
+            function onSignIn(googleUser) {
+           /*     function renderButton() {
+              gapi.signin2.render('my-signin2', {
+                'scope': 'profile email',
+                'width': 240,
+                'height': 50,
+                'longtitle': true,
+                'theme': 'dark',
+                'onsuccess': onSuccess,
+                'onfailure': onFailure
+              });
+            }*/
+            }
 
             function signOut() {
                 var auth2 = gapi.auth2.getAuthInstance();

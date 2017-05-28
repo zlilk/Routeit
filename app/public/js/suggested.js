@@ -93,8 +93,8 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
         var url = "http://localhost:3000/addRoute/" + tripId + "/" + email;
         $http.get(url).success(function(route){
             if(route != "routeNotAdded"){ 
-                var routeStr = JSON.stringify(route); 
-                localStorage.setItem("currentRoute", routeStr);
+                /*var routeStr = JSON.stringify(route); 
+                localStorage.setItem("currentRoute", routeStr);*/
                 var myRoutes = localStorage.getItem("myRoutes");
                 //if 'my routes' is empty
                 if(myRoutes == "null") {

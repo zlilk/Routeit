@@ -16,17 +16,17 @@
     <body ng-controller = "dailyController">
         <header> 
             <button class="hamburger">&#9776;</button>
-            <a href="http://localhost:8080/dailyroute.html"><h1 class = "appLogo"> Routeit </h1></a>
+            <a class = "appLogo" href="http://localhost:8080/dailyroute.html"></a>
         </header>
         <nav class="menu">
             <ul>
                 <a href="http://localhost:8080/userprofile.html"><li><img class = "userPic" src={{img}}><br>
                     <h4 id = "userName"><b> {{name}} </b></h4>     
                 </li></a>
-                <a href="http://localhost:8080/myroutes.html"><li> המסלולים שלי </li></a>
-                <a href="http://localhost:8080/routeshistory.html"><li> הסטוריית מסלולים </li></a>
-                <a href="http://localhost:8080/routeform.html"><li> תכנון מסלול חדש </li></a>
-                <a href="http://localhost:8080/dailyroute.html"><li> יום הטיול </li></a>
+                <a href="http://localhost:8080/myroutes.html"><li id="myRoutesLi"> המסלולים שלי </li></a>
+                <a href="http://localhost:8080/routeshistory.html"><li id="historyLi"> הסטוריית מסלולים </li></a>
+                <a href="http://localhost:8080/routeform.html"><li id="planLi"> תכנון מסלול חדש </li></a>
+                <a href="http://localhost:8080/dailyroute.html"><li id="dailyLi" class="selected"> יום הטיול </li></a>
             </ul>
         </nav> 
         <main>

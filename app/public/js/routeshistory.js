@@ -31,7 +31,39 @@ routesHistory.controller('RoutesHistoryController', ['$rootScope', '$scope', '$h
     $scope.showRoutesHistory = function(){
         var allPrevRoutes = [];
         for(var i = 0; i<prevRoutesArr.length; i++){
-            var route = '<section class = "route"><h3 ng-click="chosenRoute(' + prevRoutesArr[i].trip_id + ')">' + prevRoutesArr[i].trip_start_pt + ' - ' + prevRoutesArr[i].trip_end_pt +
+            var route = '<section class = "route"><img class="routePic" src="images/PIC_TRIP_01.png">';
+            var cDate = new Date(prevRoutesArr[i].creation_date);
+            var cDateString = cDate.getDate() + '/' + (cDate.getMonth()+1) + '/' + cDate.getFullYear(); 
+            route+='<p class="creationDate"> נוצר ב- '+ cDateString +'</p>'
+            +'<section class="ptsDate"><h3 class = "tripPts">' + prevRoutesArr[i].trip_start_pt + ' - ' + prevRoutesArr[i].trip_end_pt + '</h3>';
+            console.log(prevRoutesArr[i]);
+            if(prevRoutesArr[i].start_date){
+                var sDate = new Date(prevRoutesArr[i].start_date);
+                var sDateString = sDate.getDate() + '/' + (sDate.getMonth()+1) + '/' + sDate.getFullYear(); 
+                var eDate = new Date(prevRoutesArr[i].end_date);
+                var eDateString = eDate.getDate() + '/' + (eDate.getMonth()+1) + '/' + eDate.getFullYear(); 
+                console.log(prevRoutesArr[i].start_date + " " + prevRoutesArr[i].end_date); 
+                if(sDateString == eDateString){
+                    console.log("start and end dates are equal!");
+                    route += '<p id="tripDates'+i+'" class="tripDates">' + sDateString + '</section>';
+                } else {
+                    route += '<p class="tripDates" id="tripDates'+i+'">' + eDateString + " - " + sDateString + '</section>';  
+                }
+            }
+            route += '<div class = "tripDetails"><p class = "tripDetail" id="biggerWidth"> אזור: <br> <b id="smallerFont" class="detail">' + prevRoutesArr[i].area +'</b></p>';
+            if(prevRoutesArr[i].direction == "north") 
+                route+= '<p class = "tripDetail"> כיוון כללי: <br> <b class="detail"> מצפון<br> לדרום </b> </p>';
+            else route+= '<p class = "tripDetail">  כיוון כללי: <br> <b class="detail"> מדרום<br> לצפון </b> </p>'; 
+            if(prevRoutesArr[i].days_num == 1) {
+                route += '<p class = "tripDetail"><b class="detail"><br> טיול יומי </b></p>';
+            }
+            else {
+                route += '<p class = "tripDetail">מס'+"'"+' ימים: <br><b class="biggerFont">' + prevRoutesArr[i].days_num +'</b></p>';
+            }
+            route += '<p class = "tripDetail biggerWidth"> מס'+"'"+' ק"מ ליום: <br><b class="biggerFont">' + prevRoutesArr[i].day_km + '</b></p><p class = "tripDetail biggerWidth"> מס'+"'"+' ק"מ כולל: <br><b class="biggerFont">' + prevRoutesArr[i].trip_km + '</b></p></div>'
+            +'<button class = "historyDeleteBtn" ng-click="deletePrevRoute(' + prevRoutesArr[i].trip_id + ')"></button><br></section>';
+            allPrevRoutes+=route;
+            /*var route = '<section class = "route"><h3 ng-click="chosenRoute(' + prevRoutesArr[i].trip_id + ')">' + prevRoutesArr[i].trip_start_pt + ' - ' + prevRoutesArr[i].trip_end_pt +
             '</h3>';
             if(prevRoutesArr[i].direction == "north") route+= '<p> צפון -> דרום </p>';
             else route+= '<p> דרום -> צפון </p>';
@@ -56,7 +88,7 @@ routesHistory.controller('RoutesHistoryController', ['$rootScope', '$scope', '$h
             var cDate = new Date(prevRoutesArr[i].creation_date);
             var cDateString = cDate.getDate() + '/' + (cDate.getMonth()+1) + '/' + cDate.getFullYear(); 
             route+='<p> נוצר ב- '+ cDateString +'</p></section>';
-            allPrevRoutes+=route;
+            allPrevRoutes+=route;*/
         }
         $scope.prevRoutes = allPrevRoutes;
         var routesContent = angular.element(document.querySelector('#content'));
@@ -67,6 +99,7 @@ routesHistory.controller('RoutesHistoryController', ['$rootScope', '$scope', '$h
 
     //function that deletes a chosen route from traveler's routes
     $scope.deletePrevRoute = function(tripId){
+        console.log("delete");
         $http.get("http://localhost:3000/deletePrevRoute/" + userMail + "/" + tripId).success(function(routes){
             //delete the route from myRoutesArr
             for(var i = 0; i<prevRoutesArr.length; i++){

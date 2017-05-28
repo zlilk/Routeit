@@ -28,7 +28,7 @@ routeForm.controller('FormController', ['$scope', '$rootScope', '$http',function
         $scope.startPts = startPts; //an array contains all of the areas and their start points options
         $scope.dirArr = [{"name": "צפון לדרום", "value": "north"}, {"name": "מדרום לצפון", "value": "south"}];
         $scope.kmArr = [{'name': 'עד 5 ק"מ', 'value': '5', 'label': 'עד 5'}, {'name': '5-10 ק"מ ביום', 'value': '10', 'label': '5-10'}, {'name': '10-15 ק"מ ביום', 'value': '15', 'label': '10-15'}];
-        $scope.diffArr = [{'name': 'ללא העדפה', 'value': 'ללא'}, {'name': 'קל', 'value': 'קל'}, {'name': 'בינוני', 'value': 'בינוני'}, {'name': 'בינוני', 'value': 'בינוני'}];
+        $scope.diffArr = [{'name': 'ללא העדפה', 'value': 'ללא'}, {'name': 'קל', 'value': 'קל'}, {'name': 'בינוני', 'value': 'בינוני'}, {'name': 'קשה', 'value': 'קשה'}];
         $scope.typeArr = [{'name': 'ללא העדפה', 'value': 'ללא'}, {'name': 'מתאים למשפחות', 'value': 'מתאים למשפחות'}, {'name': 'מתאים לבעלי מוגבלויות', 'value': 'מתאים לבעלי מוגבלויות'}, {'name': 'מאתגר', 'value': 'מאתגר'}, {'name': 'מיטיבי לכת', 'value': 'מיטיבי לכת'}];
 
         //if the user had planned a route and go back to it
@@ -143,19 +143,20 @@ routeForm.controller('FormController', ['$scope', '$rootScope', '$http',function
             var routeStr = JSON.stringify(route);
             localStorage.setItem("suggestedRoute", routeStr);
             var sugRoute = JSON.parse(localStorage.getItem("suggestedRoute"));
+            var popupContentElement = angular.element(document.querySelector('#popupContent'));
             var popupElement = angular.element(document.querySelector('#myPopup'));
             console.log(sugRoute);
             if(sugRoute == "segmentsErr"){
-                popupElement.append('אין מספיק ימי טיול עבור נקודת ההתחלה שנבחרה. <br> נסה להוריד את ימי הטיול/את מספר הק"מ ליום'); 
+                popupContentElement.html('אין מספיק ימי טיול עבור נקודת ההתחלה שנבחרה. <br> נסה להוריד את ימי הטיול/את מספר הק"מ ליום'); 
                 popupElement.addClass("show");
             } else if(sugRoute == "typeErr"){
-                popupElement.append('המסלול אינו תואם את אופי הטיול שבחרת'); 
+                popupContentElement.html('המסלול אינו תואם את אופי הטיול שבחרת'); 
                 popupElement.addClass("show"); 
             } else if(sugRoute == "diffErr"){
-                popupElement.append('המסלול אינו תואם את רמת הקושי שבחרת'); 
+                popupContentElement.html('המסלול אינו תואם את רמת הקושי שבחרת'); 
                 popupElement.addClass("show");  
             } else if(sugRoute == "typeDiffErr"){
-                popupElement.append('המסלול אינו תואם את אופי הטיול ואת רמת הקושי שבחרת'); 
+                popupContentElement.html('המסלול אינו תואם את אופי הטיול ואת רמת הקושי שבחרת'); 
                 popupElement.addClass("show"); 
             } else window.location.assign("http://localhost:8080/suggested.html");
         });
