@@ -1,13 +1,10 @@
 {
-  "name": "webservice",
+  "name": "app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "dependencies": {
-    "body-parser": "^1.17.1",
-    "express": "^4.15.2",
-    "mongoose": "^4.10.4",
-    "mongoose-double": "^0.0.1"
+    "express": "^4.15.2"
   },
   "devDependencies": {},
   "scripts": {

@@ -53,7 +53,9 @@ var route = new schema({
     trip_difficulty: String,
     trip_type: [String],
     trip_description: [String],
-    daily_sections: [daily_section]
+    daily_sections: [daily_section],
+    disabled_flag: Boolean,
+    isChosen: Boolean
 });
 
 var prevRoute = new schema({
@@ -67,10 +69,7 @@ var prevRoute = new schema({
     end_date: Date,
     days_num: Number,
     trip_km: Number,
-    day_km: String,
-    trip_difficulty: String,
-    trip_type: [String],
-    trip_description: [String]
+    day_km: String
 });
 
 var travelerSchema = new schema({
@@ -79,7 +78,8 @@ var travelerSchema = new schema({
     email: {type:String, index:1, required:true, unique:true},
     suggested_route: route,
     previous_routes: [prevRoute],
-    my_routes: [route]
+    my_routes: [route],
+    id_counter: Number
 }, {collection: 'travelers'});
 
 var Traveler = mongoose.model('Traveler', travelerSchema);

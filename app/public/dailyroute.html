@@ -13,28 +13,32 @@
         <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.4.1.min.js"></script>
         <script src="https://cdn.klokantech.com/maptilerlayer/v1/index.js"></script> 
     </head>
-    <body ng-controller = "dailyController">
+    <body ontouchstart="" ng-controller = "dailyController">
         <header> 
             <button class="hamburger">&#9776;</button>
-            <a class = "appLogo" href="http://localhost:8080/dailyroute.html"></a>
+            <a class = "appLogo" href="https://routeit-app.herokuapp.com/dailyroute.html"></a>
         </header>
         <nav class="menu">
             <ul>
-                <a href="http://localhost:8080/userprofile.html"><li><img class = "userPic" src={{img}}><br>
+                <a href="https://routeit-app.herokuapp.com/userprofile.html"><li><img class = "userPic" src={{img}}><br>
                     <h4 id = "userName"><b> {{name}} </b></h4>     
                 </li></a>
-                <a href="http://localhost:8080/myroutes.html"><li id="myRoutesLi"> המסלולים שלי </li></a>
-                <a href="http://localhost:8080/routeshistory.html"><li id="historyLi"> הסטוריית מסלולים </li></a>
-                <a href="http://localhost:8080/routeform.html"><li id="planLi"> תכנון מסלול חדש </li></a>
-                <a href="http://localhost:8080/dailyroute.html"><li id="dailyLi" class="selected"> יום הטיול </li></a>
+                <a href="https://routeit-app.herokuapp.com/myroutes.html"><li id="myRoutesLi"> המסלולים שלי </li></a>
+                <a href="https://routeit-app.herokuapp.com/routeshistory.html"><li id="historyLi"> הסטוריית מסלולים </li></a>
+                <a href="https://routeit-app.herokuapp.com/routeform.html"><li id="planLi"> תכנון מסלול חדש </li></a>
+                <a href="https://routeit-app.herokuapp.com/dailyroute.html"><li id="dailyLi" class="selected"> יום נוכחי  </li></a>
             </ul>
         </nav> 
         <main>
+            <div id="pageMask"></div>
             <div id = #popup>
-                <span class="popuptext" id="endPopup"> האם אתה בטוח שברצונך להפסיק את הטיול? <br> <button ng-click="stay()"> הישאר בטיול </button> <button ng-click="stop()"> הפסק טיול </button></span>
+                <span class="noPadding popuptext" id="endPopup"><span id="attention"> <b>שים לב!</b> <br> האם אתה בטוח שברצונך להפסיק את הטיול? <br></span><span id="stay" ng-click="stay()"> הישאר בטיול </span> <span id="close" ng-click="stop()"> הפסק את הטיול </span></span>
             </div>
             <div id = #popup>
-                <span class="popuptext" id="alertPopup"> התראתך נשלחה בהצלחה! <span id="x" ng-click="closePopup()">&#10005;</span></span>
+                <span class="popuptext1" id="alertPopup"></p><textarea id="alertText" ng-model="alertText" placeholder="כתוב התראה..."> </textarea><br><span id="sendAlert" ng-click="addAlert()"> הוסף התראה </span><span id="stopAlert" ng-click="stopAlert()"> ביטול </span></span>
+            </div>  
+            <div id = #popup>
+                <span class="popuptext" id="sendAlertPopup"> התראתך נשלחה בהצלחה! <span id="closeAlert" ng-click="closePopup()">סגור</span></span>
             </div>
             <section id="dailyContent">
             </section>
@@ -42,12 +46,12 @@
         <footer> 
             <div class="g-signin2 hidden" id = "signInRoute" data-onsuccess="onSignIn"></div>
         </footer>
-        <script src="js/dailyMap.js"></script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&language=iw&libraries=places&callback=initMap">
-        </script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
         <script src="js/lib/angular/angular.min.js"></script>
+        <script src="js/dailyMap.js"></script>
         <script src="js/dailyroute.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClX7NRDum6_i6RO1SXeH9_REWSulwtA5c&language=iw&libraries=places&callback=initMap">
+        </script>
         <script src="js/menu.js"></script>
     </body>
  </html>

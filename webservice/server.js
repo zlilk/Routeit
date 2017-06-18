@@ -8,6 +8,7 @@ app.set('port', port);
 app.use('/',express.static('./public'));
 app.use(function(req,res,next) {
     res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE, PUT");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     app.set('json spaces', 4);
     res.set("Content-Type", "application/json");
@@ -64,7 +65,16 @@ app.get('/createTraveler/:ml/:fn/:pi', function(req,res){
 }); 
 
 app.get('/addRoute/:id/:ml', function(req,res){
-    Traveler.addRouteToTraveler(req.params.id, req.params.ml, function(data){
+    Traveler.addRouteToTraveler(req.params.id, req.params.ml, function(routeData){
+      var route = routeData;
+      Traveler.updateIdCounter(req.params.id, req.params.ml, function(data){
+        res.json(route); 
+      });
+    });
+});
+
+app.get('/getIdCounter/:ml', function(req,res){
+   Traveler.getIdCounter(req.params.ml, function(data){
       res.json(data); 
     });
 });
@@ -72,10 +82,11 @@ app.get('/addRoute/:id/:ml', function(req,res){
 app.get('/updateDates/:ml/:id/:sd/:dn/:fr/:st', function(req,res){
     console.log("before sending: " + req.params.sd);
     var date =  new Date(req.params.sd);
-    date.setHours(14);
+    //date.setHours(10);
     Traveler.updateTripDates(req.params.ml, req.params.id, date, req.params.dn, req.params.fr, req.params.st, function(data){
       res.json(data); 
     });
+    //res.json({'param': req.params.sd, 'date': date});
 });
 
 app.get('/deleteDates/:ml/:id', function(req,res){
@@ -127,14 +138,20 @@ app.get('/getPrevRoutes/:ml', function(req,res){
     });
 });
 
-app.get('/addPrevRoute/:ml', function(req,res){
-    Traveler.addPrevToTraveler(req.params.ml, function(data){
+app.get('/addPrevRoute/:ml/:rt', function(req,res){
+    Traveler.addPrevToTraveler(req.params.ml, req.params.rt, function(data){
       res.json(data); 
     });
 });
 
 app.get('/deletePrevRoute/:ml/:id', function(req,res){
     Traveler.deletePrevFromTraveler(req.params.ml, req.params.id, function(data){
+      res.json(data); 
+    });
+});
+
+app.get('/setChosen/:ml/:id/:ch', function(req,res){
+    Traveler.setChosen(req.params.ml, req.params.id, req.params.ch, function(data){
       res.json(data); 
     });
 });
