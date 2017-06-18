@@ -11,20 +11,20 @@
         <link rel="stylesheet" href="css/style.css">
         <script src="https://apis.google.com/js/platform.js" async defer></script>   
     </head>
-    <body ng-controller = "ProfileController"> 
+    <body ontouchstart="" ng-controller = "ProfileController"> 
         <header> 
             <button class="hamburger">&#9776;</button>
-            <a class = "appLogo" href="http://localhost:8080/dailyroute.html"></a>
+            <a class = "appLogo" href="https://routeit-app.herokuapp.com/dailyroute.html"></a>
         </header>
         <nav class="menu">
             <ul>
-                <a href="http://localhost:8080/userprofile.html"><li><img class = "userPic" src={{img}}><br>
+                <a href="https://routeit-app.herokuapp.com/userprofile.html"><li><img class = "userPic" src={{img}}><br>
                     <h4 id = "userName"><b> {{name}} </b></h4>     
                 </li></a>
-                <a href="http://localhost:8080/myroutes.html"><li id="myRoutesLi"> המסלולים שלי </li></a>
-                <a href="http://localhost:8080/routeshistory.html"><li id="historyLi"> הסטוריית מסלולים </li></a>
-                <a href="http://localhost:8080/routeform.html"><li id="planLi"> תכנון מסלול חדש </li></a>
-                <a href="http://localhost:8080/dailyroute.html"><li id="dailyLi"> יום הטיול </li></a>
+                <a href="https://routeit-app.herokuapp.com/myroutes.html"><li id="myRoutesLi" > המסלולים שלי </li></a>
+                <a href="https://routeit-app.herokuapp.com/routeshistory.html"><li id="historyLi"> הסטוריית מסלולים </li></a>
+                <a href="https://routeit-app.herokuapp.com/routeform.html"><li id="planLi"> תכנון מסלול חדש </li></a>
+                <a href="https://routeit-app.herokuapp.com/dailyroute.html"><li id="dailyLi">  יום נוכחי </li></a>
             </ul>
         </nav> 
         <main class = "pageMain">
@@ -33,8 +33,8 @@
                 <h4 id = "userName"> <b> {{name}} </b> </h1>
             </section>
             <section id="statistics">
-                <p class="doneStatistic"> סה"כ טיולים שבוצעו <br> {{trips}} </p>
-                <p class="doneStatistic"> סה"כ ק"מ שבוצעו <br> {{tripsKm}} </p>
+                <p class="doneStatistic"> סה"כ טיולים שבוצעו <br><b class="boldStat"> {{trips}} </b> </p>
+                <p class="doneStatistic" id="leftBorder"> סה"כ ק"מ שבוצעו <br><b class="boldStat"> {{tripsKm}}</b> </p>
                 <div class="clear"></div>
             </section>
             <section id="signOutSec">
@@ -51,7 +51,7 @@
                 auth2.signOut().then(function () {
                     console.log('User signed out.');
                 });
-                window.location.assign("http://localhost:8080/index.html");
+                window.location.assign("https://routeit-app.herokuapp.com/index.html");
             }
         </script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>

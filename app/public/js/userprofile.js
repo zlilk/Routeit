@@ -5,7 +5,7 @@ var prevRoutesArr = [];
 userProfile.run(function($rootScope ,$http) {
     var userMail = localStorage.getItem("email");
     //getting traveler's previus routes
-    $http.get("http://localhost:3000/getPrevRoutes/" + userMail).success(function(prevRoutes){
+    $http.get("https://routeit-ws.herokuapp.com/getPrevRoutes/" + userMail).success(function(prevRoutes){
         prevRoutesArr = prevRoutes.previous_routes;
         $rootScope.$broadcast('init');
     });   

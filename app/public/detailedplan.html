@@ -11,24 +11,24 @@
         <link rel="stylesheet" href="css/style.css">
         <script src="https://apis.google.com/js/platform.js" async defer></script> 
     </head>
-    <body ng-controller = "planController">
+    <body ontouchstart="" ng-controller = "planController">
         <header> 
             <button class="hamburger">&#9776;</button>
-            <a class = "appLogo" href="http://localhost:8080/dailyroute.html"></a>
+            <a class = "appLogo" href="https://routeit-app.herokuapp.com/dailyroute.html"></a>
             <button id="back" class="back" ng-click="goBack()">  &#10095; </button> 
         </header>
         <nav class="menu">
             <ul>
-                <a href="http://localhost:8080/userprofile.html"><li><img class = "userPic" src={{img}}><br>
+                <a href="https://routeit-app.herokuapp.com/userprofile.html"><li><img class = "userPic" src={{img}}><br>
                     <h4 id = "userName"><b> {{name}} </b></h4>     
                 </li></a>
-                <a href="http://localhost:8080/myroutes.html"><li id="myRoutesLi"> המסלולים שלי </li></a>
-                <a href="http://localhost:8080/routeshistory.html"><li id="historyLi"> הסטוריית מסלולים </li></a>
-                <a href="http://localhost:8080/routeform.html"><li id="planLi"> תכנון מסלול חדש </li></a>
-                <a href="http://localhost:8080/dailyroute.html"><li id="dailyLi"> יום הטיול </li></a>
+                <a href="https://routeit-app.herokuapp.com/myroutes.html"><li id="myRoutesLi"> המסלולים שלי </li></a>
+                <a href="https://routeit-app.herokuapp.com/routeshistory.html"><li id="historyLi"> הסטוריית מסלולים </li></a>
+                <a href="https://routeit-app.herokuapp.com/routeform.html"><li id="planLi"> תכנון מסלול חדש </li></a>
+                <a href="https://routeit-app.herokuapp.com/dailyroute.html"><li id="dailyLi">  יום נוכחי  </li></a>
             </ul>
         </nav> 
-        <main class="pageMain" id="detailedMain">
+        <main class="pageMain">
             <section id="tripMap">
                 <div id="map"></div>
             </section>
@@ -38,21 +38,43 @@
             <section id="tripDays">
                 <section class = "tripDay" ng-repeat = "d in dailySections">
                     <div class = "dayDate">
-                        יום {{d.dayNum}}: {{d.dayDate}}, {{d.weekDay}}
+                        יום {{d.dayNum}} {{d.dayDate}} {{d.weekDay}}
+                    </div>
+                    <div id="descTypeDiv"> 
+                        <span class="dayDescType" id="dayDesc"> 
+                            <b> מאפייני המסלול: </b><br>
+                            <span ng-repeat="c in d.description"> {{c}}, </span>
+                        </span>
+                        <span class="dayDescType"> 
+                            <b> אופי המסלול: </b><br>
+                            <span ng-repeat="c in d.type"> {{c}}, </span>
+                        </span>
+                        <div class="clear"></div>
                     </div>
                     <div class = "dayDetails">
-                        <p class="dayDetail">
-                        <img src="images/FROM_WHERE_TO.png"><br><span class="detailContent"> מ{{d.startPt}} ל{{d.endPt}}</span></p>
-                        <p class="dayDetail">
-                        <img src="images/KM.png"><br> <span class="detailContent">{{d.km}}<br> ק"מ </span></p>
-                        <p class="dayDetail">
-                        <img src="images/TIME.png"><br>{{d.duration}}<br> שעות </p>
-                        <p class="dayDetail">
-                        <img src="images/DIFFICULTY.png"><br> {{d.diff}} </p> 
-                        <p class="dayDetail">
-                        <img src="images/SLEEPING_PLACE.png"><br> 
-                        <!-- <span id = "chosenAccomm{{d.dayNum}}">{{d.chosenAccomm}}<sup id="deleteAccomm{{d.dayNum}}" ng-click="deleteAccomm(d.dayNum)"></sup></span> -->
-                        <button id="accommBtn" ng-click="showAccomm(d.endPt, d.dayNum)"> עדכן מקום לינה </button></p>
+                        <div class = "detailedIcons">
+                            <p class="dayDetail"> <img src="images/FROM_WHERE_TO.png"></p>
+                            <p class="dayDetail"><img src="images/KM.png"></p>
+                            <p class="dayDetail"><img src="images/TIME.png"></p>
+                            <p class="dayDetail"><img src="images/DIFFICULTY.png"></p>
+                            <p class="dayDetail"><img src="images/SLEEPING_PLACE.png"></p>
+                        </div>
+                        <div class = "detailedContent">
+                            <p class="dayDetail1"><span class="detailContent"> מ{{d.startPt}} ל{{d.endPt}}</span></p>
+                            <p class="dayDetail1"><span class="detailContent">{{d.km}}<br> ק"מ </span></p>
+                            <p class="dayDetail1"> {{d.duration}}<br> שעות </p>
+                            <p class="dayDetail1"> {{d.diff}} </p>
+                            <p class="dayDetail1"> <span id = "chosenAccomm{{d.dayNum}}">
+                            <button id="accommBtn" ng-click="showAccomm(d.endPt, d.dayNum)"> עדכן מקום לינה </button></span></p> 
+                        </div>
+                      
+                        <!-- <p class="dayDetail">
+                            <img src="images/SLEEPING_PLACE.png"><br>
+                            <span id = "chosenAccomm{{d.dayNum}}">
+                                <button id="accommBtn" ng-click="showAccomm(d.endPt, d.dayNum)"> עדכן מקום לינה </button> {{d.chosenAccomm}}<sup id="deleteAccomm{{d.dayNum}}" ng-click="deleteAccomm(d.dayNum)"></sup> 
+                            </span>
+                        </p>-->
+
                        <div class="clear"></div> 
                     </div>
                 </section>

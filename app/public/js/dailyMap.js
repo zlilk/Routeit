@@ -19,21 +19,36 @@ function initMap() {
     }
     var chosenRoute = JSON.parse(localStorage.getItem("chosenRoute"));
     if(chosenRoute == null){
+         console.log(navigator.geolocation);
          navigator.geolocation.getCurrentPosition(function(position){
+            console.log("hi");
             window.lat = position.coords.latitude;
             window.lng = position.coords.longitude;
-            map  = new google.maps.Map(document.getElementById('map'), {
-                center:{lat:window.lat, lng:window.lng},
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat:window.lat, lng:window.lng},
                 zoom:13,
                 mapTypeId: google.maps.MapTypeId.ROAD
             });
             var mark = new google.maps.Marker({position:{lat:lat, lng:lng}, map:map});
             document.getElementById('map').className = 'backgroundMap';
+            console.log(document.getElementById('map'));
+        }, function(error){ 
+            console.warn(error);
+            map = new google.maps.Map(document.getElementById('map'), {
+                center:{lat: 32.090565, lng: 34.803046},
+                zoom:13,
+                mapTypeId: google.maps.MapTypeId.ROAD
+            });
+            var mark = new google.maps.Marker({position:{lat:32.090565, lng:34.803046}, map:map});
+            document.getElementById('map').className = 'backgroundMap'; 
+        }, 
+        {
+            enableHighAccuracy: false,
+            timeout: 10000
         });
     }
     //if there is a chosen trip for the current day
     else {
-        document.getElementById('map').className = 'miniMap'; //change map display settings
         var dailyCoordsArray = []; // holds one daily section's coords
         // get the current day coords
         var currentDate = new Date(); //today's date
@@ -67,25 +82,33 @@ function initMap() {
         function CenterControl(controlDiv, map) {
             // Set CSS for the control border.
             var controlUI = document.createElement('div');
-            controlUI.style.backgroundColor = '#fff';
-            controlUI.style.border = '2px solid #fff';
-            controlUI.style.borderRadius = '3px';
-            controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+            //controlUI.style.backgroundColor = '#fff';
+            //controlUI.style.border = '2px solid #fff';
+            //controlUI.style.borderRadius = '3px';
+            //controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
             controlUI.style.cursor = 'pointer';
-            controlUI.style.marginBottom = '22px';
-            controlUI.style.textAlign = 'center';
+            //controlUI.style.marginTop = '500px';
+            //controlUI.style.marginRight = '320px';
+            controlUI.style.position = 'fixed';
+            controlUI.style.left = '2%';
+            controlUI.style.top = '20vh';
             controlUI.title = 'Click to recenter the map';
             controlDiv.appendChild(controlUI);
 
             // Set CSS for the control interior.
             var controlText = document.createElement('div');
-            controlText.style.color = 'rgb(25,25,25)';
-            controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-            controlText.style.fontSize = '16px';
-            controlText.style.lineHeight = '38px';
-            controlText.style.paddingLeft = '5px';
-            controlText.style.paddingRight = '5px';
-            controlText.innerHTML = '&#9737;';
+            //controlText.style.color = 'rgb(25,25,25)';
+            //controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+            //controlText.style.fontSize = '16px';
+            //controlText.style.lineHeight = '38px';
+            //controlText.style.padding = '20px';
+            //controlText.style.paddingRight = '20px';
+            //controlText.backgroundImage = 'url("../images/NAVIGATOR.png")';
+            controlText.border = 'none';
+            controlText.display = 'block';
+            controlText.width = '100px';
+            controlText.height = '100px';
+            controlText.innerHTML = '<img src="../images/NAVIGATOR.png">'; 
             controlUI.appendChild(controlText);
 
             // Setup the click event listeners - set the map to the user's current location
@@ -130,6 +153,7 @@ function initMap() {
                     alertMarkers[i] = new google.maps.Marker({
                         position: coord,
                         map: map,
+                        icon: "../images/ALERT.png",
                         title: dayAlerts[i].content
                     });
                     var infowindow = new google.maps.InfoWindow();
@@ -141,6 +165,7 @@ function initMap() {
                     });
                 }
             }
+            document.getElementById('map').className = 'backgroundMap'; //change map display settings
 
             //adding a pin with the chosen accomm for the day
             if(chosenRoute.daily_sections[currentDayPos].chosen_accomm != null){
@@ -154,6 +179,7 @@ function initMap() {
                     if (status === google.maps.places.PlacesServiceStatus.OK) {
                         var marker = new google.maps.Marker({
                             map: map,
+                            icon: '../images/BED.png',
                             position: place.geometry.location
                         });
                         google.maps.event.addListener(marker, 'click', function() {

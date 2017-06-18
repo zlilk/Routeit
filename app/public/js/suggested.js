@@ -5,6 +5,7 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
     $scope.name =  localStorage.getItem("name");
     $scope.img = localStorage.getItem("pic");
     var sugJson = JSON.parse(sugRoute);
+    console.log(sugJson.disabled_flag);
     //merge daily sections coord arrays
     var tripCoordsArr = []; // all daily sections coords
     var tmpCoordsArr = []; // holds coords temporarily 
@@ -33,8 +34,8 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
 
     //getting suggested route overview
     $scope.area = sugJson.area;
-    if(sugJson.direction == "north") $scope.direction = "צפון -> דרום";
-    else $scope.direction = "דרום -> צפון";
+    if(sugJson.direction == "north") $scope.direction = "מצפון לדרום";
+    else $scope.direction = "מדרום לצפון";
     $scope.tripStartPt = sugJson.trip_start_pt;
     $scope.tripEndPt = sugJson.trip_end_pt;
     $scope.tripDaysNum = sugJson.days_num;
@@ -43,20 +44,41 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
     $scope.tripDiff = sugJson.trip_difficulty;
     $scope.tripType = newTripType;
 
+    if(sugJson.disabled_flag == true){
+        var disabledElement = angular.element(document.querySelector('#sugDisabled'));
+        disabledElement.html('<img id="disabledIcon" src="../images/DISABLED.png">');
+    }
+    
     //building all daily sections overview
     var routeDailySecs = ""; //holds all daily sections html
     for(var i=0; i<sugJson.daily_sections.length; i++){
-        var dailySec = '<section class="suggesteDailySec"><span> מספר יום: ' +  sugJson.daily_sections[i].day_num +
-        '</span><br> <span> נקודת התחלה: ' +  sugJson.daily_sections[i].start_pt + 
-        '</span><br> <span>  נקודת סיום: ' +  sugJson.daily_sections[i].end_pt + 
-        '</span><br> <span> מספר ק"מ: ' +  sugJson.daily_sections[i].total_km +
-        '</span><br> <span> רמת קושי: ' +  sugJson.daily_sections[i].difficulty +
-        '</span><br> <span> משך: ' +  sugJson.daily_sections[i].duration + ' שעות </span> <br> <span> מאפייני המסלול: ';
+        var dailySec = '<section class="suggesteDailySec"><h4 id="sugDayNum"> יום ' +  sugJson.daily_sections[i].day_num +
+        ':</h4><div id="descTypeDiv"> <span class="dayDescType" id="dayDesc"> <b> מאפייני המסלול: </b> <br>';
         for(var j = 0; j<sugJson.daily_sections[i].description.length; j++){
             console.log(sugJson.daily_sections[i].description[j]);
-            dailySec += sugJson.daily_sections[i].description[j] + '<br>';
+            if(j == (sugJson.daily_sections[i].description.length)-1) {
+                 dailySec += sugJson.daily_sections[i].description[j] +'</span>';
+            }
+            else {
+                dailySec += sugJson.daily_sections[i].description[j] + ', ';
+            }
         }
-        dailySec+='</span></section><br>';
+        dailySec+='<span class="dayDescType"> <b> אופי המסלול: </b><br>';
+        for(var j = 0; j<sugJson.daily_sections[i].type.length; j++){
+            console.log(sugJson.daily_sections[i].type[j]);
+            if(j == (sugJson.daily_sections[i].type.length)-1) {
+                 dailySec += sugJson.daily_sections[i].type[j] +'</span><div class="clear"></div></div>';
+            }
+            else {
+                dailySec += sugJson.daily_sections[i].type[j] + ', ';
+            }
+        }
+        dailySec+='<div class="sugDailyDetails"><div class="sugDayIcons"> <p class="sugDayDetail"> <img src="images/FROM_WHERE_TO.png"></p>'
+        +'<p class="sugDayDetail"><img src="images/KM.png"></p> <p class="sugDayDetail"><img src="images/TIME.png"></p>'
+        +'<p class="sugDayDetail"><img src="images/DIFFICULTY.png"></p></div>'
+        +'<div class = "sugDayDetails"> <p class="sugDayDetail1"><span class="detailContent"> מ'+  sugJson.daily_sections[i].start_pt +' <br> ל'+  sugJson.daily_sections[i].end_pt +'</span></p>'
+        +'<p class="sugDayDetail1"><span class="detailContent">'+  sugJson.daily_sections[i].total_km +'<br> ק"מ </span></p>'
+        +'<p class="sugDayDetail1">'+ sugJson.daily_sections[i].duration +'<br> שעות </p> <p class="sugDayDetail1">'+  sugJson.daily_sections[i].difficulty +'</p></div></div></section>';
         routeDailySecs+=dailySec;
     }
     $scope.dailySecs = routeDailySecs;
@@ -69,17 +91,20 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
     $scope.isOpen = false; //flag to check if the daily sections overview is open
     //function to show and hide daily sections overview
     $scope.showHide = function(){
+        var showBtn = angular.element(document.querySelector('#showDays'));
         //if the overview is is closed
         if($scope.isOpen == false){
             dailySecsContent.removeClass('hidden');
             dailySecsContent.addClass('visible');
-            $scope.isOpen = true;   
+            $scope.isOpen = true;
+            showBtn.css('background', "url('../images/MORE1.png') no-repeat center");   
         } 
         //if the overview is open
         else {
             dailySecsContent.removeClass('visible');
             dailySecsContent.addClass('hidden');
             $scope.isOpen = false;
+            showBtn.css('background', "url('../images/MORE.png') no-repeat center");
         }
     };
 
@@ -90,11 +115,11 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
         var email = localStorage.getItem("email");
         var newIdCounter = tripId + 1;
         localStorage.setItem("idCounter", newIdCounter);
-        var url = "http://localhost:3000/addRoute/" + tripId + "/" + email;
+        var url = "https://routeit-ws.herokuapp.com/addRoute/" + tripId + "/" + email;
         $http.get(url).success(function(route){
             if(route != "routeNotAdded"){ 
-                /*var routeStr = JSON.stringify(route); 
-                localStorage.setItem("currentRoute", routeStr);*/
+                var routeStr = JSON.stringify(route); 
+                localStorage.setItem("currentRoute", routeStr);
                 var myRoutes = localStorage.getItem("myRoutes");
                 //if 'my routes' is empty
                 if(myRoutes == "null") {
@@ -110,7 +135,7 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
                     var myRoutesStr = JSON.stringify(myRoutesArr);
                     localStorage.setItem("myRoutes", myRoutesStr); 
                 }
-                window.location.assign("http://localhost:8080/myroutes.html");
+                window.location.assign("https://routeit-app.herokuapp.com/myroutes.html");
             }
         });
     };
@@ -118,15 +143,19 @@ suggestedRoute.controller('SuggestedController', ['$rootScope', '$scope', '$http
     $scope.goBack = function(){
         var popupElement = angular.element(document.querySelector('#myPopup'));
         popupElement.addClass("show");
+        var maskElement = angular.element(document.querySelector('#pageMask'));
+        maskElement.addClass("pageMask");
     }
 
     $scope.stay = function(){
         var popupElement = angular.element(document.querySelector('#myPopup'));
         popupElement.removeClass("show");
+        var maskElement = angular.element(document.querySelector('#pageMask'));
+        maskElement.removeClass("pageMask");
     }
 
     $scope.back = function(){
         localStorage.setItem("suggestedBack", true);
-        window.location.assign("http://localhost:8080/routeform.html");
+        window.location.assign("https://routeit-app.herokuapp.com/routeform.html");
     }
 }]);

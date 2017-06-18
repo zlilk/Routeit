@@ -1,4 +1,5 @@
 var express = require('express');
 var app = express();
-app.use('/',express.static('./public')).listen(8080);
-console.log("listening on port 8080");
+var port = process.env.PORT || 8080;
+app.use('/',express.static('./public')).listen(port);
+console.log("listening on port");

@@ -16,9 +16,9 @@ exports.createTraveler = function(mail, name, pic, callback){
                 full_name: name,
                 image: pic,
                 email: mail,
-                current_route_id: "",
                 previous_routes: [],
-                my_routes: []
+                my_routes: [],
+                id_counter: 0
         }); 
         newUser.save();
         callback("newUser"); 
@@ -88,7 +88,9 @@ exports.addRouteToTraveler = function(id, mail, callback){
           trip_difficulty: route.trip_difficulty,
           trip_type: route.trip_type,
           trip_description: route.trip_description,
-          daily_sections: dailySectionsArr
+          daily_sections: dailySectionsArr,
+          disabled_flag: route.disabled_flag,
+          isChosen: route.isChosen
         };
 
       var query = Traveler.findOneAndUpdate({email: mail}, {$push: {my_routes: myRoute}});
@@ -98,6 +100,23 @@ exports.addRouteToTraveler = function(id, mail, callback){
         //callback("routeAdded");
       });
     });
+}
+
+exports.updateIdCounter = function(id, mail, callback){
+  var newId = parseInt(id)+1;
+  var query = Traveler.findOneAndUpdate({email: mail}, {$set: {id_counter: newId}});
+  query.exec(function(err,route){
+    if(err) callback("counterNotUpdated"); 
+    callback("updatedCounter");
+  });
+}
+
+exports.getIdCounter = function(email, callback){
+  var query = Traveler.findOne().where('email', email).select('id_counter');
+  query.exec(function(err,idCounter){
+    if(err) callback("idCounterNotFound");
+    callback(idCounter);
+  });
 }
 
 // calculate trip end date and daily sections dates and update the trip dates 
@@ -124,7 +143,7 @@ exports.updateTripDates = function(mail, tripId, sDate, daysNum, isFri, isSat, c
   for(var i = 0;  i<tripDatesArr.length; i++){
     console.log(tripDatesArr[i]);
   }
-	
+  
   //updating trip dates to traveler's trip
   var query = Traveler.findOne().where('email', mail).select('my_routes');
     query.exec(function(err,routes){
@@ -149,10 +168,10 @@ exports.updateTripDates = function(mail, tripId, sDate, daysNum, isFri, isSat, c
       if(isRouteFound == true){
         routes.set('my_routes', myRoutes);
         routes.save();
-      	//callback("datesUpdated");
+        //callback("datesUpdated");
         callback(updatedRoute);
       }
-      else callback("routeNotFound");	
+      else callback("routeNotFound"); 
     });
 }
 
@@ -285,8 +304,8 @@ exports.getAllPreviousRoutes = function(mail, callback){
     });
 }
 
-exports.addPrevToTraveler = function(mail, callback){
-  //a route to add to 'my routes'
+exports.addPrevToTraveler = function(mail, routeStr, callback){
+  var detailsArr = routeStr.split(",");
   /*var prevRoute = {
     trip_id: 1000,
     area: "ירושלים",
@@ -301,10 +320,10 @@ exports.addPrevToTraveler = function(mail, callback){
     day_km: "עד 5",
     trip_difficulty: "המסלול ברובו ברמת קושי בינונית",
     trip_type: ["מתאים למשפחות"],
-    trip_description: ["מסלול ירוק", "נוף מרהיב", "מתאים לכל עונות השנה"],
+    trip_description: ["מסלול ירוק", "נוף מרהיב", "מתאים לכל עונות השנה"]
   };*/
 
-  var prevRoute = {
+  /*var prevRoute = {
     trip_id: 1001,
     area: "המכתשים",
     direction: "north",
@@ -318,7 +337,21 @@ exports.addPrevToTraveler = function(mail, callback){
     day_km: "5-10",
     trip_difficulty: "המסלול ברובו ברמת קושי קשה",
     trip_type: ["מאתגר"],
-    trip_description: ["מכיל עליות", "נוף מרהיב", "מתאים לכל עונות השנה"],
+    trip_description: ["מכיל עליות", "נוף מרהיב", "מתאים לכל עונות השנה"]
+  };*/
+
+  var prevRoute = {
+    trip_id: detailsArr[0],
+    area: detailsArr[1],
+    direction: detailsArr[2],
+    creation_date: detailsArr[3],
+    trip_start_pt: detailsArr[4],
+    trip_end_pt: detailsArr[5],
+    start_date: detailsArr[6],
+    end_date: detailsArr[7],
+    days_num: detailsArr[8],
+    trip_km: detailsArr[9],
+    day_km: detailsArr[10]
   };
     
   var query = Traveler.findOneAndUpdate({email: mail}, {$push: {previous_routes: prevRoute}});
@@ -384,7 +417,9 @@ exports.addRouteToSuggested = function(route, mail, callback){
       trip_difficulty: route.trip_difficulty,
       trip_type: route.trip_type,
       trip_description: route.trip_description,
-      daily_sections: dailySectionsArr
+      daily_sections: dailySectionsArr,
+      disabled_flag: route.disabled_flag,
+      isChosen: route.isChosen
     };
 
     console.log("suggested is: " + sugRoute);
@@ -395,4 +430,26 @@ exports.addRouteToSuggested = function(route, mail, callback){
       if(err) callback("routeNotAddedToSuggested");  
       callback(route);
     });
+}
+
+exports.setChosen = function(mail, tripId, isChosen, callback){
+  var query = Traveler.findOne().where('email', mail).select('my_routes');
+  query.exec(function(err,routes){
+  if(err) callback("myRoutesNotFound");
+    var isRouteFound = false;
+    var myRoutes = routes.my_routes;
+    for(var i = 0; i<myRoutes.length; i++){
+      if(myRoutes[i].trip_id == tripId){
+        isRouteFound = true;
+        myRoutes[i].isChosen = isChosen;
+        break;
+      }
+    }
+    if(isRouteFound == true){
+      routes.set('my_routes', myRoutes);
+      routes.save();
+      callback("isChosenUpdated"); 
+    }
+    else callback("routeNotFound");
+  });
 }
